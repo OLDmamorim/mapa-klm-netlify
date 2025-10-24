@@ -125,6 +125,12 @@
     </style>
 </head>
 <body>
+    <script>
+        // Verificar login ANTES de carregar a página
+        if (!sessionStorage.getItem('admin_logged_in')) {
+            window.location.href = '/login.html';
+        }
+    </script>
     <div class="container">
         <div class="header">
             <h1>Painel de Administração</h1>
@@ -178,11 +184,6 @@
     </div>
     
     <script>
-        // Verificar se está logado
-        if (!sessionStorage.getItem('admin_logged_in')) {
-            window.location.href = '/login.html';
-        }
-        
         function logout() {
             sessionStorage.removeItem('admin_logged_in');
             window.location.href = '/login.html';
