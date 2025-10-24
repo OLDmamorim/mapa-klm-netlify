@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAPA KLM - ExpressGlass</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -172,10 +173,25 @@
             color: #742a2a;
             border: 1px solid #fc8181;
         }
+        
+        .select2-container--default .select2-selection--single {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            height: 44px;
+            padding: 6px 12px;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 30px;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px;
+        }
     </style>
 </head>
 <body>
-    <button class="admin-btn" onclick="window.location.href='/admin.html'">ADMIN</button>
+    <button class="admin-btn" onclick="window.location.href='/login.html'">ADMIN</button>
     
     <div class="logo-container">
         <img src="/logo.png" alt="ExpressGlass">
@@ -195,7 +211,7 @@
             
             <div class="form-group">
                 <label>Nome <span>*</span></label>
-                <select id="colaborador" required>
+                <select id="colaborador" required style="width: 100%">
                     <option value="">A carregar...</option>
                 </select>
             </div>
@@ -231,23 +247,38 @@
         <div class="message" id="message"></div>
     </div>
     
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        let colaboradoresGlobal = [];
+        
         // Carregar colaboradores
         fetch('/.netlify/functions/get-colaboradores')
             .then(res => res.json())
             .then(data => {
-                const select = document.getElementById('colaborador');
-                select.innerHTML = '<option value="">Selecione o colaborador</option>';
+                colaboradoresGlobal = data;
+                const select = $('#colaborador');
+                select.empty();
+                select.append('<option value=""></option>');
                 data.forEach(colab => {
-                    const option = document.createElement('option');
-                    option.value = JSON.stringify(colab);
-                    option.textContent = `${colab.nome} (${colab.codigo})`;
-                    select.appendChild(option);
+                    const option = new Option(`${colab.nome} (${colab.codigo}) - ${colab.loja}`, JSON.stringify(colab), false, false);
+                    select.append(option);
+                });
+                
+                // Inicializar Select2 com busca
+                select.select2({
+                    placeholder: 'Digite para procurar...',
+                    allowClear: true,
+                    language: {
+                        noResults: function() {
+                            return "Nenhum colaborador encontrado";
+                        }
+                    }
                 });
             })
             .catch(err => {
                 console.error('Erro ao carregar colaboradores:', err);
-                document.getElementById('colaborador').innerHTML = '<option value="">Erro ao carregar</option>';
+                $('#colaborador').html('<option value="">Erro ao carregar</option>');
             });
         
         // Submeter formulário
@@ -262,7 +293,17 @@
             loading.style.display = 'block';
             message.style.display = 'none';
             
-            const colaboradorData = JSON.parse(document.getElementById('colaborador').value);
+            const colaboradorValue = $('#colaborador').val();
+            if (!colaboradorValue) {
+                message.className = 'message error';
+                message.textContent = 'Por favor selecione um colaborador';
+                message.style.display = 'block';
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+                return;
+            }
+            
+            const colaboradorData = JSON.parse(colaboradorValue);
             
             const formData = {
                 data: document.getElementById('data').value,
@@ -287,6 +328,7 @@
                     message.textContent = 'Relatório enviado com sucesso! Verifique o seu email.';
                     message.style.display = 'block';
                     e.target.reset();
+                    $('#colaborador').val(null).trigger('change');
                 } else {
                     throw new Error(result.error || 'Erro ao enviar relatório');
                 }

@@ -1,6 +1,8 @@
 const postgres = require('postgres');
 
-const colaboradoresData = [
+const DATABASE_URL = "postgresql://neondb_owner:npg_ImXEh0Htw3oT@ep-sweet-union-abvkt925-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require";
+
+const colaboradores = [
   {"codigo": "689", "nome": "João Fonseca", "loja": "PAREDES SM", "funcao": "Técnico", "empresa": "Expressglass SA"},
   {"codigo": "171", "nome": "Tiago Costa", "loja": "BARCELOS", "funcao": "Responsável", "empresa": "Expressglass SA"},
   {"codigo": "694", "nome": "Tânia Martins", "loja": "BRAGA - MINHO CENTER", "funcao": "Técnico", "empresa": "Expressglass SA"},
@@ -28,34 +30,33 @@ const colaboradoresData = [
   {"codigo": "598", "nome": "André Ramoa", "loja": "VILA VERDE", "funcao": "Responsável", "empresa": "Expressglass SA"}
 ];
 
-exports.handler = async (event, context) => {
+async function initDatabase() {
+  const sql = postgres(DATABASE_URL, { ssl: 'require' });
+  
   try {
-    // Se tiver DATABASE_URL, buscar da base de dados
-    if (process.env.DATABASE_URL) {
-      const sql = postgres(process.env.DATABASE_URL, { ssl: 'prefer' });
-      const colaboradores = await sql`SELECT * FROM colaboradores ORDER BY nome`;
-      await sql.end();
-      
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(colaboradores)
-      };
+    console.log('Limpando colaboradores antigos...');
+    await sql`DELETE FROM colaboradores`;
+    
+    console.log('Populando colaboradores...');
+    
+    for (const colab of colaboradores) {
+      await sql`
+        INSERT INTO colaboradores (codigo, nome, loja, funcao, empresa)
+        VALUES (${colab.codigo}, ${colab.nome}, ${colab.loja}, ${colab.funcao}, ${colab.empresa})
+      `;
     }
     
-    // Senão, retornar dados estáticos
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(colaboradoresData)
-    };
+    console.log(`${colaboradores.length} colaboradores inseridos!`);
+    
+    const count = await sql`SELECT COUNT(*) as total FROM colaboradores`;
+    console.log(`Total de colaboradores na base de dados: ${count[0].total}`);
+    
   } catch (error) {
     console.error('Erro:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: error.message })
-    };
+  } finally {
+    await sql.end();
   }
-};
+}
+
+initDatabase();
 

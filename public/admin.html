@@ -33,7 +33,7 @@
             align-items: center;
         }
         
-        .back-btn {
+        .back-btn, .logout-btn {
             background: #667eea;
             color: white;
             border: none;
@@ -41,6 +41,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
+            margin-left: 10px;
         }
         
         .tabs {
@@ -127,7 +128,10 @@
     <div class="container">
         <div class="header">
             <h1>Painel de Administração</h1>
-            <button class="back-btn" onclick="window.location.href='/'">Voltar</button>
+            <div>
+                <button class="back-btn" onclick="window.location.href='/'">Voltar</button>
+                <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
         </div>
         
         <div class="tabs">
@@ -174,6 +178,16 @@
     </div>
     
     <script>
+        // Verificar se está logado
+        if (!sessionStorage.getItem('admin_logged_in')) {
+            window.location.href = '/login.html';
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('admin_logged_in');
+            window.location.href = '/login.html';
+        }
+        
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));

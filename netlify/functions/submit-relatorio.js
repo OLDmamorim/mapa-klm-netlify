@@ -1,6 +1,7 @@
 const postgres = require('postgres');
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
+const { createTransport } = nodemailer;
 
 async function generatePDF(data) {
   return new Promise((resolve, reject) => {
@@ -50,7 +51,7 @@ async function generatePDF(data) {
 }
 
 async function sendEmail(pdfBuffer, data) {
-  const transporter = nodemailer.createTransporter({
+  const transporter = createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT),
     secure: false,
