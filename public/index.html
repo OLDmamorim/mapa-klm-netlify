@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAPA KLM - ExpressGlass</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .admin-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .logo-container {
+            background: white;
+            padding: 20px 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo-container img {
+            height: 60px;
+        }
+        
+        h1 {
+            color: white;
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .form-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        label span {
+            color: #e53e3e;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 4px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+    </style>
+</head>
+<body>
+    <button class="admin-btn" onclick="window.location.href='/admin.html'">ADMIN</button>
+    
+    <div class="logo-container">
+        <img src="/logo.png" alt="ExpressGlass">
+    </div>
+    
+    <h1>MAPA KLM</h1>
+    <p class="subtitle">Despesas de KM em Viatura Própria</p>
+    
+    <div class="form-container">
+        <h2 class="form-title">Registo KLM</h2>
+        
+        <form id="klmForm">
+            <div class="form-group">
+                <label>Data <span>*</span></label>
+                <input type="date" id="data" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Nome <span>*</span></label>
+                <select id="colaborador" required>
+                    <option value="">A carregar...</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Matrícula <span>*</span></label>
+                <input type="text" id="matricula" placeholder="Ex: AT-29-XC" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Localidade <span>*</span></label>
+                <input type="text" id="localidade" placeholder="Destino da viagem" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Motivo <span>*</span></label>
+                <textarea id="motivo" placeholder="Descreva o motivo da deslocação" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>KLM <span>*</span></label>
+                <input type="number" id="klm" placeholder="Total (ida e volta)" step="0.1" required>
+                <div class="hint">Coloca o total (ida e volta)</div>
+            </div>
+            
+            <button type="submit" class="submit-btn">Submeter</button>
+        </form>
+        
+        <div class="loading">
+            <p>A processar...</p>
+        </div>
+        
+        <div class="message" id="message"></div>
+    </div>
+    
+    <script>
+        // Carregar colaboradores
+        fetch('/.netlify/functions/get-colaboradores')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('colaborador');
+                select.innerHTML = '<option value="">Selecione o colaborador</option>';
+                data.forEach(colab => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(colab);
+                    option.textContent = `${colab.nome} (${colab.codigo})`;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error('Erro ao carregar colaboradores:', err);
+                document.getElementById('colaborador').innerHTML = '<option value="">Erro ao carregar</option>';
+            });
+        
+        // Submeter formulário
+        document.getElementById('klmForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('.submit-btn');
+            const loading = document.querySelector('.loading');
+            const message = document.getElementById('message');
+            
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            message.style.display = 'none';
+            
+            const colaboradorData = JSON.parse(document.getElementById('colaborador').value);
+            
+            const formData = {
+                data: document.getElementById('data').value,
+                colaborador: colaboradorData,
+                matricula: document.getElementById('matricula').value,
+                localidade: document.getElementById('localidade').value,
+                motivo: document.getElementById('motivo').value,
+                klm: parseFloat(document.getElementById('klm').value)
+            };
+            
+            try {
+                const response = await fetch('/.netlify/functions/submit-relatorio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    message.className = 'message success';
+                    message.textContent = 'Relatório enviado com sucesso! Verifique o seu email.';
+                    message.style.display = 'block';
+                    e.target.reset();
+                } else {
+                    throw new Error(result.error || 'Erro ao enviar relatório');
+                }
+            } catch (error) {
+                message.className = 'message error';
+                message.textContent = error.message;
+                message.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+
