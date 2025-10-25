@@ -175,6 +175,7 @@
                             <th>Localidade</th>
                             <th>KLM</th>
                             <th>Submetido em</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="relatoriosBody"></tbody>
@@ -240,6 +241,9 @@
                         <td>${r.localidade}</td>
                         <td>${r.klm} km</td>
                         <td>${new Date(r.created_at).toLocaleString('pt-PT')}</td>
+                        <td>
+                            <button class="btn btn-edit" onclick="downloadPDF(${r.id})">Download PDF</button>
+                        </td>
                     </tr>
                 `).join('');
                 
@@ -248,6 +252,10 @@
             } catch (error) {
                 console.error('Erro:', error);
             }
+        }
+        
+        function downloadPDF(relatorioId) {
+            window.open(`/.netlify/functions/download-pdf?id=${relatorioId}`, '_blank');
         }
         
         // Carregar colaboradores ao iniciar
