@@ -306,7 +306,7 @@
                 colaboradores.forEach(col => {
                     const option = document.createElement('option');
                     option.value = JSON.stringify({codigo: col.codigo, nome: col.nome});
-                    option.textContent = `${col.nome} (${col.codigo})`;
+                    option.textContent = col.nome;
                     select.appendChild(option);
                 });
             } catch (error) {
