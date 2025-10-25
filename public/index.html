@@ -72,7 +72,9 @@
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .form-title {
@@ -104,8 +106,9 @@
             padding: 12px;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 16px;
             transition: border-color 0.3s;
+            font-family: inherit;
         }
         
         input:focus, select:focus, textarea:focus {
@@ -113,9 +116,9 @@
             border-color: #667eea;
         }
         
-        textarea {
-            resize: vertical;
-            min-height: 80px;
+        input[readonly] {
+            background-color: #f7fafc;
+            cursor: not-allowed;
         }
         
         .hint {
@@ -124,70 +127,133 @@
             margin-top: 4px;
         }
         
-        .submit-btn {
+        .deslocacoes-container {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .deslocacao-item {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .deslocacao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .deslocacao-title {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 16px;
+        }
+        
+        .remove-btn {
+            background: #fc8181;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .remove-btn:hover {
+            background: #f56565;
+        }
+        
+        .add-btn {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .add-btn:hover {
+            background: #38a169;
+        }
+        
+        .add-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        button[type="submit"] {
+            width: 100%;
+            padding: 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
         }
         
-        .submit-btn:hover {
+        button[type="submit"]:hover {
             transform: translateY(-2px);
         }
         
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-            color: #667eea;
-        }
-        
-        .message {
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
             padding: 12px;
             border-radius: 8px;
             margin-top: 20px;
-            display: none;
+            font-size: 14px;
         }
         
-        .message.success {
+        .success-message {
             background: #c6f6d5;
             color: #22543d;
-            border: 1px solid #9ae6b4;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
         }
         
-        .message.error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #fc8181;
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="admin-btn" onclick="window.location.href='/login.html'">ADMIN</button>
+    <button class="admin-btn" onclick="window.location.href='admin.html'">ADMIN</button>
     
     <div class="logo-container">
-        <img src="/logo.png" alt="ExpressGlass">
+        <img src="SemTítulo-1.png" alt="ExpressGlass">
     </div>
     
     <h1>MAPA KLM</h1>
-    <p class="subtitle">Despesas de KM em Viatura Própria</p>
+    <p class="subtitle">Relatório de Deslocações</p>
     
     <div class="form-container">
-        <h2 class="form-title">Registo KLM</h2>
+        <h2 class="form-title">Novo Relatório</h2>
         
-        <form id="klmForm">
+        <form id="relatorioForm">
             <div class="form-group">
                 <label>Data <span>*</span></label>
                 <input type="date" id="data" required>
@@ -195,152 +261,215 @@
             
             <div class="form-group">
                 <label>Nome <span>*</span></label>
-                <input type="text" id="colaborador" list="colaboradores-list" placeholder="Digite para procurar..." required autocomplete="off">
-                <datalist id="colaboradores-list"></datalist>
-                <div class="hint">Digite o nome ou código do colaborador</div>
+                <select id="nome" required>
+                    <option value="">Selecione o colaborador</option>
+                </select>
+                <p class="hint">Digite o nome ou código do colaborador</p>
             </div>
             
             <div class="form-group">
                 <label>Código</label>
-                <input type="text" id="codigo" readonly style="background-color: #f7fafc; cursor: not-allowed;">
+                <input type="text" id="codigo" readonly>
             </div>
             
             <div class="form-group">
                 <label>Matrícula <span>*</span></label>
-                <input type="text" id="matricula" placeholder="Ex: AT-29-XC" pattern="[A-Z0-9]{2}-[A-Z0-9]{2}-[A-Z0-9]{2}" maxlength="8" required style="text-transform: uppercase;">
-                <div class="hint">Formato: XX-XX-XX (letras e números)</div>
+                <input type="text" id="matricula" placeholder="XX-XX-XX" maxlength="8" required>
+                <p class="hint">Formato: XX-XX-XX (letras e números)</p>
             </div>
             
-            <div class="form-group">
-                <label>Localidade <span>*</span></label>
-                <input type="text" id="localidade" placeholder="Destino da viagem" required>
+            <div class="deslocacoes-container">
+                <h3 style="margin-bottom: 15px; color: #667eea;">Deslocações</h3>
+                <div id="deslocacoesContainer"></div>
+                <button type="button" class="add-btn" id="addDeslocacaoBtn" onclick="addDeslocacao()">
+                    + Adicionar Deslocação
+                </button>
             </div>
             
-            <div class="form-group">
-                <label>Motivo <span>*</span></label>
-                <textarea id="motivo" placeholder="Descreva o motivo da deslocação" required></textarea>
-            </div>
+            <button type="submit">Submeter</button>
             
-            <div class="form-group">
-                <label>KLM <span>*</span></label>
-                <input type="number" id="klm" placeholder="Total (ida e volta)" step="0.1" required>
-                <div class="hint">Coloca o total (ida e volta)</div>
-            </div>
-            
-            <button type="submit" class="submit-btn">Submeter</button>
+            <div id="message"></div>
         </form>
-        
-        <div class="loading">
-            <p>A processar...</p>
-        </div>
-        
-        <div class="message" id="message"></div>
     </div>
     
     <script>
-        let colaboradoresGlobal = [];
+        let deslocacaoCount = 0;
+        const MAX_DESLOCACOES = 5;
         
-        // Formatar matrícula automaticamente
-        document.getElementById('matricula').addEventListener('input', (e) => {
+        // Carregar colaboradores
+        async function loadColaboradores() {
+            try {
+                const response = await fetch('/.netlify/functions/get-colaboradores');
+                const colaboradores = await response.json();
+                
+                const select = document.getElementById('nome');
+                colaboradores.forEach(col => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({codigo: col.codigo, nome: col.nome});
+                    option.textContent = `${col.nome} (${col.codigo})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar colaboradores:', error);
+            }
+        }
+        
+        // Preencher código automaticamente
+        document.getElementById('nome').addEventListener('change', function() {
+            const codigoInput = document.getElementById('codigo');
+            if (this.value) {
+                const data = JSON.parse(this.value);
+                codigoInput.value = data.codigo;
+            } else {
+                codigoInput.value = '';
+            }
+        });
+        
+        // Formatação automática da matrícula
+        document.getElementById('matricula').addEventListener('input', function(e) {
             let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-            if (value.length > 2) value = value.slice(0, 2) + '-' + value.slice(2);
-            if (value.length > 5) value = value.slice(0, 5) + '-' + value.slice(5);
-            if (value.length > 8) value = value.slice(0, 8);
+            
+            if (value.length > 2) {
+                value = value.slice(0, 2) + '-' + value.slice(2);
+            }
+            if (value.length > 5) {
+                value = value.slice(0, 5) + '-' + value.slice(5);
+            }
+            if (value.length > 8) {
+                value = value.slice(0, 8);
+            }
+            
             e.target.value = value;
         });
         
-        // Preencher código automaticamente ao selecionar colaborador
-        document.getElementById('colaborador').addEventListener('input', (e) => {
-            const colaboradorInput = e.target.value;
-            const colaboradorData = colaboradoresGlobal.find(c => 
-                colaboradorInput.includes(c.nome) || colaboradorInput.includes(c.codigo)
-            );
-            
-            if (colaboradorData) {
-                document.getElementById('codigo').value = colaboradorData.codigo;
-            } else {
-                document.getElementById('codigo').value = '';
-            }
+        // Adicionar primeira deslocação ao carregar
+        window.addEventListener('DOMContentLoaded', function() {
+            loadColaboradores();
+            addDeslocacao(); // Adiciona a primeira deslocação automaticamente
         });
         
-        // Carregar colaboradores
-        fetch('/.netlify/functions/get-colaboradores')
-            .then(res => res.json())
-            .then(data => {
-                colaboradoresGlobal = data;
-                const datalist = document.getElementById('colaboradores-list');
-                data.forEach(colab => {
-                    const option = document.createElement('option');
-                    option.value = `${colab.nome} (${colab.codigo}) - ${colab.loja}`;
-                    option.dataset.colaborador = JSON.stringify(colab);
-                    datalist.appendChild(option);
-                });
-            })
-            .catch(err => {
-                console.error('Erro ao carregar colaboradores:', err);
-            });
-        
-        // Submeter formulário
-        document.getElementById('klmForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitBtn = e.target.querySelector('.submit-btn');
-            const loading = document.querySelector('.loading');
-            const message = document.getElementById('message');
-            
-            submitBtn.disabled = true;
-            loading.style.display = 'block';
-            message.style.display = 'none';
-            
-            const colaboradorInput = document.getElementById('colaborador').value;
-            
-            // Encontrar colaborador pelo nome ou código
-            const colaboradorData = colaboradoresGlobal.find(c => 
-                colaboradorInput.includes(c.nome) || colaboradorInput.includes(c.codigo)
-            );
-            
-            if (!colaboradorData) {
-                message.className = 'message error';
-                message.textContent = 'Por favor selecione um colaborador válido da lista';
-                message.style.display = 'block';
-                submitBtn.disabled = false;
-                loading.style.display = 'none';
+        function addDeslocacao() {
+            if (deslocacaoCount >= MAX_DESLOCACOES) {
                 return;
             }
             
-            const formData = {
-                data: document.getElementById('data').value,
-                colaborador: colaboradorData,
-                matricula: document.getElementById('matricula').value,
-                localidade: document.getElementById('localidade').value,
-                motivo: document.getElementById('motivo').value,
-                klm: parseFloat(document.getElementById('klm').value)
-            };
+            deslocacaoCount++;
+            const container = document.getElementById('deslocacoesContainer');
+            
+            const deslocacaoDiv = document.createElement('div');
+            deslocacaoDiv.className = 'deslocacao-item';
+            deslocacaoDiv.id = `deslocacao-${deslocacaoCount}`;
+            
+            deslocacaoDiv.innerHTML = `
+                <div class="deslocacao-header">
+                    <span class="deslocacao-title">Deslocação ${deslocacaoCount}</span>
+                    ${deslocacaoCount > 1 ? `<button type="button" class="remove-btn" onclick="removeDeslocacao(${deslocacaoCount})">Remover</button>` : ''}
+                </div>
+                
+                <div class="form-group">
+                    <label>Localidade <span>*</span></label>
+                    <input type="text" name="localidade_${deslocacaoCount}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Motivo <span>*</span></label>
+                    <textarea name="motivo_${deslocacaoCount}" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>KLM <span>*</span></label>
+                    <input type="number" name="klm_${deslocacaoCount}" step="0.01" min="0" required>
+                    <p class="hint">Coloca o total (ida e volta)</p>
+                </div>
+            `;
+            
+            container.appendChild(deslocacaoDiv);
+            updateAddButton();
+        }
+        
+        function removeDeslocacao(id) {
+            const element = document.getElementById(`deslocacao-${id}`);
+            if (element) {
+                element.remove();
+                deslocacaoCount--;
+                renumberDeslocacoes();
+                updateAddButton();
+            }
+        }
+        
+        function renumberDeslocacoes() {
+            const items = document.querySelectorAll('.deslocacao-item');
+            items.forEach((item, index) => {
+                const title = item.querySelector('.deslocacao-title');
+                if (title) {
+                    title.textContent = `Deslocação ${index + 1}`;
+                }
+            });
+        }
+        
+        function updateAddButton() {
+            const addBtn = document.getElementById('addDeslocacaoBtn');
+            const actualCount = document.querySelectorAll('.deslocacao-item').length;
+            
+            if (actualCount >= MAX_DESLOCACOES) {
+                addBtn.disabled = true;
+                addBtn.textContent = 'Máximo de 5 deslocações atingido';
+            } else {
+                addBtn.disabled = false;
+                addBtn.textContent = '+ Adicionar Deslocação';
+            }
+        }
+        
+        // Submit do formulário
+        document.getElementById('relatorioForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '';
             
             try {
+                const nomeData = JSON.parse(document.getElementById('nome').value);
+                
+                // Coletar todas as deslocações
+                const deslocacoes = [];
+                const items = document.querySelectorAll('.deslocacao-item');
+                
+                items.forEach((item, index) => {
+                    const num = index + 1;
+                    deslocacoes.push({
+                        localidade: document.querySelector(`[name="localidade_${num}"]`).value,
+                        motivo: document.querySelector(`[name="motivo_${num}"]`).value,
+                        klm: parseFloat(document.querySelector(`[name="klm_${num}"]`).value)
+                    });
+                });
+                
+                const data = {
+                    data: document.getElementById('data').value,
+                    colaborador_codigo: nomeData.codigo,
+                    colaborador_nome: nomeData.nome,
+                    matricula: document.getElementById('matricula').value,
+                    deslocacoes: deslocacoes
+                };
+                
                 const response = await fetch('/.netlify/functions/submit-relatorio', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify(data)
                 });
                 
                 const result = await response.json();
                 
                 if (response.ok) {
-                    message.className = 'message success';
-                    message.textContent = 'Relatório enviado com sucesso! Verifique o seu email.';
-                    message.style.display = 'block';
-                    e.target.reset();
+                    messageDiv.innerHTML = '<div class="success-message">Relatório submetido com sucesso! Email enviado.</div>';
+                    document.getElementById('relatorioForm').reset();
+                    document.getElementById('deslocacoesContainer').innerHTML = '';
+                    deslocacaoCount = 0;
+                    addDeslocacao();
                 } else {
-                    throw new Error(result.error || 'Erro ao enviar relatório');
+                    messageDiv.innerHTML = `<div class="error-message">${result.error || 'Erro ao submeter relatório'}</div>`;
                 }
             } catch (error) {
-                message.className = 'message error';
-                message.textContent = error.message;
-                message.style.display = 'block';
-            } finally {
-                submitBtn.disabled = false;
-                loading.style.display = 'none';
+                messageDiv.innerHTML = `<div class="error-message">${error.message}</div>`;
             }
         });
     </script>
