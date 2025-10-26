@@ -1,47 +1,192 @@
 const postgres = require('postgres');
 const PDFDocument = require('pdfkit');
+const https = require('https');
+const http = require('http');
+
+// Função para baixar imagem de URL
+function downloadImage(url) {
+  return new Promise((resolve, reject) => {
+    const protocol = url.startsWith('https') ? https : http;
+    protocol.get(url, (response) => {
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => resolve(Buffer.concat(chunks)));
+      response.on('error', reject);
+    }).on('error', reject);
+  });
+}
 
 async function generatePDF(relatorio) {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: 'A4', margin: 50 });
-    const chunks = [];
-    
-    doc.on('data', chunk => chunks.push(chunk));
-    doc.on('end', () => resolve(Buffer.concat(chunks)));
-    doc.on('error', reject);
-    
-    // Header
-    doc.fontSize(20).text('MAPA DE QUILÓMETROS', { align: 'center' });
-    doc.fontSize(12).text('Despesas de KM em Viatura Própria', { align: 'center' });
-    doc.moveDown(2);
-    
-    // Dados do colaborador
-    doc.fontSize(14).text('Dados do Colaborador', { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(11);
-    doc.text(`Nome: ${relatorio.colaborador_nome}`);
-    doc.text(`Código: ${relatorio.colaborador_codigo}`);
-    doc.moveDown(1.5);
-    
-    // Dados da viagem
-    doc.fontSize(14).text('Dados da Deslocação', { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(11);
-    doc.text(`Data: ${new Date(relatorio.data).toLocaleDateString('pt-PT')}`);
-    doc.text(`Matrícula: ${relatorio.matricula}`);
-    doc.text(`Localidade: ${relatorio.localidade}`);
-    doc.text(`Motivo: ${relatorio.motivo}`);
-    doc.text(`Quilómetros: ${relatorio.klm} km`);
-    doc.moveDown(2);
-    
-    // Assinatura
-    doc.fontSize(11);
-    doc.text('_'.repeat(50));
-    doc.text('Assinatura do Colaborador');
-    doc.moveDown(1);
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-PT')}`);
-    
-    doc.end();
+  return new Promise(async (resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ 
+        size: 'A4', 
+        margin: 50,
+        bufferPages: true
+      });
+      const chunks = [];
+      
+      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', reject);
+      
+      // Baixar logo e assinatura
+      const logoUrl = 'https://mapaklmeg.netlify.app/logo-expressglass.png';
+      const assinaturaUrl = 'https://mapaklmeg.netlify.app/assinatura-responsavel.png';
+      
+      let logoBuffer, assinaturaBuffer;
+      try {
+        logoBuffer = await downloadImage(logoUrl);
+        assinaturaBuffer = await downloadImage(assinaturaUrl);
+      } catch (err) {
+        console.warn('Erro ao baixar imagens:', err);
+      }
+      
+      // CABEÇALHO
+      if (logoBuffer) {
+        doc.image(logoBuffer, 50, 40, { width: 180 });
+      }
+      
+      doc.fontSize(16).font('Helvetica-Bold')
+         .text('DESPESAS DE KM EM VIATURA PRÓPRIA', 250, 60, { align: 'right' });
+      
+      doc.moveDown(3);
+      
+      // IDENTIFICAÇÃO
+      const startY = 130;
+      doc.fontSize(12).font('Helvetica-Bold').text('Identificação:', 50, startY);
+      doc.moveDown(0.8);
+      
+      const fieldY = startY + 30;
+      doc.fontSize(10).font('Helvetica');
+      doc.text('Utilizador:', 50, fieldY);
+      doc.rect(150, fieldY - 5, 400, 20).stroke();
+      doc.text(relatorio.colaborador_nome, 155, fieldY, { width: 390 });
+      
+      doc.text('Nº Colaborador:', 50, fieldY + 35);
+      doc.rect(150, fieldY + 30, 200, 20).stroke();
+      doc.text(relatorio.colaborador_codigo, 155, fieldY + 35, { width: 190 });
+      
+      doc.text('Empresa:', 50, fieldY + 70);
+      doc.rect(150, fieldY + 65, 200, 20).stroke();
+      doc.text('Expressglass SA', 155, fieldY + 70, { width: 190 });
+      
+      doc.text('Centro de Custo:', 50, fieldY + 105);
+      doc.rect(150, fieldY + 100, 200, 20).stroke();
+      doc.text(relatorio.loja || '', 155, fieldY + 105, { width: 190 });
+      
+      // DESPESAS - MAPA DE KM
+      const despesasY = fieldY + 145;
+      doc.fontSize(12).font('Helvetica-Bold').text('Despesas - Mapa de Km', 50, despesasY);
+      doc.moveDown(0.8);
+      
+      const dataY = despesasY + 30;
+      
+      // Parse da data
+      const [year, month, day] = relatorio.data.split('-');
+      const dataFormatada = `${day}/${month}/${year}`;
+      const diaTabela = `${day}/${month}`;
+      
+      doc.fontSize(10).font('Helvetica');
+      doc.text('Data', 50, dataY);
+      doc.rect(150, dataY - 5, 200, 20).stroke();
+      doc.text(dataFormatada, 155, dataY, { width: 190 });
+      
+      doc.text('Matrícula:', 50, dataY + 35);
+      doc.rect(150, dataY + 30, 200, 20).stroke();
+      doc.text(relatorio.matricula, 155, dataY + 35, { width: 190 });
+      
+      doc.text('Proprietário:', 50, dataY + 70);
+      doc.rect(150, dataY + 65, 400, 20).stroke();
+      // Proprietário fica vazio
+      
+      // TABELA
+      const tableY = dataY + 110;
+      const colWidths = [60, 60, 60, 60, 120, 130];
+      const colX = [50, 110, 170, 230, 290, 410];
+      const rowHeight = 30;
+      
+      // Cabeçalho da tabela
+      doc.fontSize(9).font('Helvetica-Bold');
+      const headers = ['Dia', 'Saída', 'Chegada', "Km's", 'Local', 'Motivo'];
+      
+      // Desenhar cabeçalho
+      for (let i = 0; i < headers.length; i++) {
+        doc.rect(colX[i], tableY, colWidths[i], rowHeight).stroke();
+        doc.text(headers[i], colX[i] + 5, tableY + 10, { 
+          width: colWidths[i] - 10, 
+          align: 'center' 
+        });
+      }
+      
+      // Linha de dados
+      doc.font('Helvetica');
+      const dataRow = [
+        diaTabela,
+        '09H00',
+        '18H00',
+        relatorio.klm.toString(),
+        relatorio.localidade,
+        relatorio.motivo
+      ];
+      
+      for (let i = 0; i < dataRow.length; i++) {
+        doc.rect(colX[i], tableY + rowHeight, colWidths[i], rowHeight).stroke();
+        doc.text(dataRow[i], colX[i] + 5, tableY + rowHeight + 10, { 
+          width: colWidths[i] - 10, 
+          align: i < 4 ? 'center' : 'left'
+        });
+      }
+      
+      // CÁLCULOS
+      const calcY = tableY + rowHeight * 2 + 20;
+      const totalKm = parseFloat(relatorio.klm);
+      const valorPorKm = 0.36;
+      const totalDespesas = totalKm * valorPorKm;
+      
+      doc.fontSize(10).font('Helvetica');
+      doc.text('Total Km', 350, calcY);
+      doc.text(totalKm.toFixed(2), 450, calcY);
+      
+      doc.text('Valor/Km', 350, calcY + 20);
+      doc.text(`${valorPorKm.toFixed(2)} €`, 450, calcY + 20);
+      
+      doc.fontSize(11).font('Helvetica-Bold');
+      doc.rect(260, calcY + 50, 290, 30).stroke();
+      doc.text('Total de Despesas:', 270, calcY + 60);
+      doc.text(`${totalDespesas.toFixed(2)} €`, 470, calcY + 60);
+      
+      // OBSERVAÇÕES
+      const obsY = calcY + 100;
+      doc.fontSize(10).font('Helvetica');
+      doc.text('Observações:', 50, obsY);
+      doc.rect(180, obsY - 5, 370, 80).stroke();
+      
+      // ASSINATURAS
+      const assY = obsY + 100;
+      doc.fontSize(10).font('Helvetica');
+      doc.text('O Colaborador:', 80, assY);
+      doc.moveTo(80, assY + 40).lineTo(220, assY + 40).stroke();
+      
+      doc.text('O Responsável:', 350, assY);
+      if (assinaturaBuffer) {
+        doc.image(assinaturaBuffer, 350, assY + 10, { width: 120, height: 30 });
+      }
+      doc.moveTo(350, assY + 40).lineTo(490, assY + 40).stroke();
+      
+      // NOTA DE RODAPÉ
+      doc.fontSize(8).font('Helvetica');
+      doc.text(
+        'Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e 31 do mês N serão pagos no mês N+1',
+        50,
+        assY + 70,
+        { width: 500, align: 'left' }
+      );
+      
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -82,11 +227,14 @@ exports.handler = async (event) => {
     
     await sql.end();
     
+    const [year, month, day] = relatorio.data.split('-');
+    const dataFormatada = `${day}-${month}-${year}`;
+    
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="Relatorio_${relatorio.colaborador_nome.replace(/ /g, '_')}_${relatorio.data}.pdf"`
+        'Content-Disposition': `attachment; filename="Relatorio_KM_${relatorio.colaborador_nome.replace(/ /g, '_')}_${dataFormatada}.pdf"`
       },
       body: pdfBuffer.toString('base64'),
       isBase64Encoded: true
