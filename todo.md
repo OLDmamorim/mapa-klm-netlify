@@ -17,13 +17,16 @@
 - [x] Campo Loja alterado para dropdown com 15 lojas
 
 ## Pending Features
-- [ ] Reformatar PDF para seguir template oficial ExpressGlass
-  - [ ] Cabeçalho com logo e título "DESPESAS - MAPA DE KM"
-  - [ ] Campos de identificação: Utilizador, Nº Colaborador, Empresa, Centro de Custo
-  - [ ] Campos de despesa: Data, Matrícula, Proprietário (vazio)
-  - [ ] Tabela com colunas: Dia, Saída (09H00), Chegada (18H00), Km's, Local, Motivo
-  - [ ] Cálculos: Total Km, Valor/Km (0,36€), Total de Despesas
-  - [ ] Assinatura do responsável com imagem
+- [x] Reformatar PDF para seguir template oficial ExpressGlass
+  - [x] Cabeçalho com logo e título "DESPESAS - MAPA DE KM"
+  - [x] Campos de identificação: Utilizador, Nº Colaborador, Empresa, Centro de Custo
+  - [x] Campos de despesa: Data, Matrícula, Proprietário (vazio)
+  - [x] Tabela com colunas: Dia, Saída (09H00), Chegada (18H00), Km's, Local, Motivo
+  - [x] Cálculos: Total Km, Valor/Km (0,36€), Total de Despesas
+  - [x] Assinatura do responsável com imagem
 - [ ] Resolver cache CDN do dropdown de colaboradores
 - [ ] Verificar visibilidade do botão "Adicionar Colaborador"
+
+
+- [ ] Corrigir erro de timezone na submissão do formulário
 

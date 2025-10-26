@@ -104,7 +104,9 @@ async function generatePDF(data) {
          .font('Helvetica')
          .text('Data', 50, doc.y);
       doc.rect(180, doc.y - 15, 150, 20).stroke();
-      doc.text(new Date(data.data).toLocaleDateString('pt-PT'), 185, doc.y - 12);
+      const [year, month, day] = data.data.split('-');
+      const dataFormatada = `${day}/${month}/${year}`;
+      doc.text(dataFormatada, 185, doc.y - 12);
       
       doc.moveDown(1.5);
       
@@ -142,7 +144,8 @@ async function generatePDF(data) {
       let yPos = tableTop + 25;
       
       data.deslocacoes.forEach((desl) => {
-        const dia = new Date(data.data).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' });
+        const [year, month, day] = data.data.split('-');
+        const dia = `${day}/${month}`;
         const rowData = [dia, '09H00', '18H00', desl.klm, desl.localidade, desl.motivo];
         
         xPos = 50;
@@ -247,10 +250,10 @@ async function sendEmail(pdfBuffer, data) {
   const mailOptions = {
     from: process.env.SMTP_USER,
     to: process.env.ADMIN_EMAIL || 'mamorim@expressglass.pt',
-    subject: `MAPA KLM - ${data.colaborador_nome} - ${new Date(data.data).toLocaleDateString('pt-PT')}`,
-    text: `Novo relatório de KM submetido por ${data.colaborador_nome}.\n\nDetalhes:\n- Data: ${new Date(data.data).toLocaleDateString('pt-PT')}\n- Loja: ${data.loja}\n- Matrícula: ${data.matricula}\n- Localidades: ${localidades}\n- Total KM: ${totalKM.toFixed(2)} km\n- Total Despesas: ${totalDespesas} €\n- Número de deslocações: ${data.deslocacoes.length}`,
+    subject: `MAPA KLM - ${data.colaborador_nome} - ${data.data.split('-').reverse().join('/')}`,
+    text: `Novo relatório de KM submetido por ${data.colaborador_nome}.\n\nDetalhes:\n- Data: ${data.data.split('-').reverse().join('/')}\n- Loja: ${data.loja}\n- Matrícula: ${data.matricula}\n- Localidades: ${localidades}\n- Total KM: ${totalKM.toFixed(2)} km\n- Total Despesas: ${totalDespesas} €\n- Número de deslocações: ${data.deslocacoes.length}`,
     attachments: [{
-      filename: `Relatorio_${data.colaborador_nome.replace(/ /g, '')}_${new Date(data.data).toISOString().split('T')[0]}.pdf`,
+      filename: `Relatorio_${data.colaborador_nome.replace(/ /g, '')}_${data.data}.pdf`,
       content: pdfBuffer
     }]
   };
