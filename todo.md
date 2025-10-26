@@ -28,5 +28,5 @@
 - [ ] Verificar visibilidade do botão "Adicionar Colaborador"
 
 
-- [ ] Corrigir erro de timezone na submissão do formulário
+- [x] Corrigir erro de timezone na submissão do formulário
 
