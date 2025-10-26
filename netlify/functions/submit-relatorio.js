@@ -1,58 +1,231 @@
 const postgres = require('postgres');
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
+const https = require('https');
+const http = require('http');
+
+// Função para baixar imagem de URL
+function downloadImage(url) {
+  return new Promise((resolve, reject) => {
+    const protocol = url.startsWith('https') ? https : http;
+    protocol.get(url, (response) => {
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => resolve(Buffer.concat(chunks)));
+      response.on('error', reject);
+    }).on('error', reject);
+  });
+}
 
 async function generatePDF(data) {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: 'A4', margin: 50 });
-    const chunks = [];
-    
-    doc.on('data', chunk => chunks.push(chunk));
-    doc.on('end', () => resolve(Buffer.concat(chunks)));
-    doc.on('error', reject);
-    
-    // Header
-    doc.fontSize(20).text('MAPA DE QUILÓMETROS', { align: 'center' });
-    doc.fontSize(12).text('Despesas de KM em Viatura Própria', { align: 'center' });
-    doc.moveDown(2);
-    
-    // Dados do colaborador
-    doc.fontSize(14).text('Dados do Colaborador', { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(11);
-    doc.text(`Nome: ${data.colaborador_nome}`);
-    doc.text(`Código: ${data.colaborador_codigo}`);
-    doc.text(`Data: ${new Date(data.data).toLocaleDateString('pt-PT')}`);
-    doc.text(`Matrícula: ${data.matricula}`);
-    doc.moveDown(1.5);
-    
-    // Deslocações
-    doc.fontSize(14).text('Deslocações', { underline: true });
-    doc.moveDown(0.5);
-    
-    let totalKM = 0;
-    data.deslocacoes.forEach((desl, index) => {
-      doc.fontSize(12).text(`Deslocação ${index + 1}:`, { underline: true });
-      doc.fontSize(11);
-      doc.text(`  Localidade: ${desl.localidade}`);
-      doc.text(`  Motivo: ${desl.motivo}`);
-      doc.text(`  Quilómetros: ${desl.klm} km`);
-      doc.moveDown(0.5);
-      totalKM += parseFloat(desl.klm);
-    });
-    
-    doc.moveDown(1);
-    doc.fontSize(12).text(`TOTAL: ${totalKM.toFixed(2)} km`, { bold: true });
-    doc.moveDown(2);
-    
-    // Assinatura
-    doc.fontSize(11);
-    doc.text('_'.repeat(50));
-    doc.text('Assinatura do Colaborador');
-    doc.moveDown(1);
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-PT')}`);
-    
-    doc.end();
+  return new Promise(async (resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ 
+        size: 'A4', 
+        margin: 50,
+        bufferPages: true
+      });
+      const chunks = [];
+      
+      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', reject);
+      
+      // Baixar logo e assinatura
+      const logoUrl = 'https://mapaklmeg.netlify.app/logo-expressglass.png';
+      const assinaturaUrl = 'https://mapaklmeg.netlify.app/assinatura-responsavel.png';
+      
+      let logoBuffer, assinaturaBuffer;
+      try {
+        logoBuffer = await downloadImage(logoUrl);
+        assinaturaBuffer = await downloadImage(assinaturaUrl);
+      } catch (err) {
+        console.warn('Erro ao baixar imagens:', err);
+      }
+      
+      // CABEÇALHO
+      if (logoBuffer) {
+        doc.image(logoBuffer, 50, 40, { width: 180 });
+      }
+      
+      doc.fontSize(16)
+         .font('Helvetica-Bold')
+         .text('DESPESAS DE KM EM VIATURA PRÓPRIA', 250, 50, { align: 'right' });
+      
+      doc.moveDown(3);
+      
+      // IDENTIFICAÇÃO
+      const startY = 120;
+      doc.fontSize(12)
+         .font('Helvetica-Bold')
+         .text('Identificação:', 50, startY);
+      
+      doc.moveDown(1);
+      
+      // Utilizador
+      doc.fontSize(10)
+         .font('Helvetica')
+         .text('Utilizador:', 50, doc.y);
+      doc.rect(180, doc.y - 15, 365, 20).stroke();
+      doc.text(data.colaborador_nome, 185, doc.y - 12);
+      
+      doc.moveDown(1.5);
+      
+      // Nº Colaborador
+      doc.text('Nº Colaborador:', 50, doc.y);
+      doc.rect(180, doc.y - 15, 150, 20).stroke();
+      doc.text(data.colaborador_codigo, 185, doc.y - 12);
+      
+      doc.moveDown(1.5);
+      
+      // Empresa
+      doc.text('Empresa:', 50, doc.y);
+      doc.rect(180, doc.y - 15, 150, 20).stroke();
+      doc.text('Expressglass SA', 185, doc.y - 12);
+      
+      doc.moveDown(1.5);
+      
+      // Centro de Custo (Loja)
+      doc.text('Centro de Custo:', 50, doc.y);
+      doc.rect(180, doc.y - 15, 150, 20).stroke();
+      doc.text(data.loja || '', 185, doc.y - 12);
+      
+      doc.moveDown(2);
+      
+      // DESPESAS - MAPA DE KM
+      doc.fontSize(12)
+         .font('Helvetica-Bold')
+         .text('Despesas - Mapa de Km', 50, doc.y);
+      
+      doc.moveDown(1);
+      
+      // Data
+      doc.fontSize(10)
+         .font('Helvetica')
+         .text('Data', 50, doc.y);
+      doc.rect(180, doc.y - 15, 150, 20).stroke();
+      doc.text(new Date(data.data).toLocaleDateString('pt-PT'), 185, doc.y - 12);
+      
+      doc.moveDown(1.5);
+      
+      // Matrícula
+      doc.text('Matrícula:', 50, doc.y);
+      doc.rect(180, doc.y - 15, 150, 20).stroke();
+      doc.text(data.matricula, 185, doc.y - 12);
+      
+      doc.moveDown(1.5);
+      
+      // Proprietário
+      doc.text('Proprietário:', 50, doc.y);
+      doc.rect(180, doc.y - 15, 365, 20).stroke();
+      
+      doc.moveDown(2);
+      
+      // TABELA DE DESLOCAÇÕES
+      const tableTop = doc.y;
+      const colWidths = [60, 60, 70, 60, 150, 145];
+      const headers = ['Dia', 'Saída', 'Chegada', "Km's", 'Local', 'Motivo'];
+      
+      // Cabeçalho da tabela
+      doc.fontSize(9)
+         .font('Helvetica-Bold');
+      
+      let xPos = 50;
+      headers.forEach((header, i) => {
+        doc.rect(xPos, tableTop, colWidths[i], 25).stroke();
+        doc.text(header, xPos + 5, tableTop + 8, { width: colWidths[i] - 10 });
+        xPos += colWidths[i];
+      });
+      
+      // Linhas da tabela
+      doc.font('Helvetica');
+      let yPos = tableTop + 25;
+      
+      data.deslocacoes.forEach((desl) => {
+        const dia = new Date(data.data).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' });
+        const rowData = [dia, '09H00', '18H00', desl.klm, desl.localidade, desl.motivo];
+        
+        xPos = 50;
+        rowData.forEach((cell, i) => {
+          doc.rect(xPos, yPos, colWidths[i], 25).stroke();
+          doc.text(String(cell), xPos + 5, yPos + 8, { width: colWidths[i] - 10, height: 20 });
+          xPos += colWidths[i];
+        });
+        
+        yPos += 25;
+      });
+      
+      // Linhas vazias adicionais (mínimo 3 linhas)
+      const minRows = 3;
+      const currentRows = data.deslocacoes.length;
+      for (let i = 0; i < Math.max(0, minRows - currentRows); i++) {
+        xPos = 50;
+        colWidths.forEach((width) => {
+          doc.rect(xPos, yPos, width, 25).stroke();
+          xPos += width;
+        });
+        yPos += 25;
+      }
+      
+      doc.moveDown(2);
+      yPos = doc.y;
+      
+      // CÁLCULOS
+      const totalKM = data.deslocacoes.reduce((sum, d) => sum + parseFloat(d.klm), 0);
+      const valorPorKm = 0.36;
+      const totalDespesas = totalKM * valorPorKm;
+      
+      doc.fontSize(10);
+      doc.text('Total Km', 350, yPos);
+      doc.text(totalKM.toFixed(2), 450, yPos);
+      
+      doc.moveDown(0.8);
+      doc.text('Valor/Km', 350, doc.y);
+      doc.text('0,36 €', 450, doc.y);
+      
+      doc.moveDown(1.5);
+      
+      // Total de Despesas (caixa destacada)
+      doc.fontSize(11)
+         .font('Helvetica-Bold');
+      doc.rect(260, doc.y, 285, 30).stroke();
+      doc.text('Total de Despesas:', 270, doc.y + 10);
+      doc.text(`${totalDespesas.toFixed(2)} €`, 480, doc.y - 10, { align: 'right' });
+      
+      doc.moveDown(3);
+      
+      // OBSERVAÇÕES
+      doc.fontSize(10)
+         .font('Helvetica');
+      doc.text('Observações:', 50, doc.y);
+      doc.rect(180, doc.y - 15, 365, 80).stroke();
+      
+      doc.moveDown(6);
+      
+      // ASSINATURAS
+      const signY = doc.y + 20;
+      
+      // O Colaborador
+      doc.text('O Colaborador:', 80, signY);
+      doc.moveTo(80, signY + 40).lineTo(230, signY + 40).stroke();
+      
+      // O Responsável
+      doc.text('O Responsável:', 350, signY);
+      if (assinaturaBuffer) {
+        doc.image(assinaturaBuffer, 350, signY + 5, { width: 120, height: 30 });
+      }
+      doc.moveTo(350, signY + 40).lineTo(500, signY + 40).stroke();
+      
+      // NOTA DE RODAPÉ
+      doc.fontSize(8)
+         .font('Helvetica')
+         .text('Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e', 50, doc.page.height - 80);
+      doc.text('31 do mês N serão pagos no mês N+1', 50, doc.page.height - 68);
+      
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
@@ -68,13 +241,14 @@ async function sendEmail(pdfBuffer, data) {
   });
   
   const totalKM = data.deslocacoes.reduce((sum, d) => sum + parseFloat(d.klm), 0);
+  const totalDespesas = (totalKM * 0.36).toFixed(2);
   const localidades = data.deslocacoes.map(d => d.localidade).join(', ');
   
   const mailOptions = {
     from: process.env.SMTP_USER,
     to: process.env.ADMIN_EMAIL || 'mamorim@expressglass.pt',
     subject: `MAPA KLM - ${data.colaborador_nome} - ${new Date(data.data).toLocaleDateString('pt-PT')}`,
-    text: `Novo relatório de KM submetido por ${data.colaborador_nome}.\n\nDetalhes:\n- Data: ${new Date(data.data).toLocaleDateString('pt-PT')}\n- Localidades: ${localidades}\n- Total KM: ${totalKM.toFixed(2)} km\n- Número de deslocações: ${data.deslocacoes.length}`,
+    text: `Novo relatório de KM submetido por ${data.colaborador_nome}.\n\nDetalhes:\n- Data: ${new Date(data.data).toLocaleDateString('pt-PT')}\n- Loja: ${data.loja}\n- Matrícula: ${data.matricula}\n- Localidades: ${localidades}\n- Total KM: ${totalKM.toFixed(2)} km\n- Total Despesas: ${totalDespesas} €\n- Número de deslocações: ${data.deslocacoes.length}`,
     attachments: [{
       filename: `Relatorio_${data.colaborador_nome.replace(/ /g, '')}_${new Date(data.data).toISOString().split('T')[0]}.pdf`,
       content: pdfBuffer

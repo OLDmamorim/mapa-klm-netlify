@@ -305,7 +305,7 @@
                 const select = document.getElementById('nome');
                 colaboradores.forEach(col => {
                     const option = document.createElement('option');
-                    option.value = JSON.stringify({codigo: col.codigo, nome: col.nome});
+                    option.value = JSON.stringify({codigo: col.codigo, nome: col.nome, loja: col.loja});
                     option.textContent = col.nome;
                     select.appendChild(option);
                 });
@@ -447,6 +447,7 @@
                     data: document.getElementById('data').value,
                     colaborador_codigo: nomeData.codigo,
                     colaborador_nome: nomeData.nome,
+                    loja: nomeData.loja,
                     matricula: document.getElementById('matricula').value,
                     deslocacoes: deslocacoes
                 };
