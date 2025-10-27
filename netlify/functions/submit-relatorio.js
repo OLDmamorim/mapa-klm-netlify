@@ -120,7 +120,7 @@ async function generatePDF(data) {
       // Proprietário
       doc.text('Proprietário:', 50, doc.y);
       doc.rect(180, doc.y - 15, 365, 20).stroke();
-      doc.text(data.nome, 185, doc.y - 12);
+      doc.text(data.colaborador_nome || '', 185, doc.y - 12);
       
       doc.moveDown(2);
       
