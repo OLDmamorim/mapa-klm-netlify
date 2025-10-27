@@ -210,8 +210,8 @@ async function generatePDF(data) {
         // Assinatura ACIMA da linha (entre o texto e a linha)
         doc.image(assinaturaBuffer, 380, signY + 10, { width: 80 });
       }
-      // Linha ABAIXO da assinatura
-      doc.moveTo(350, signY + 50).lineTo(500, signY + 50).stroke();
+      // Linha ABAIXO da assinatura (60px para garantir espaço suficiente)
+      doc.moveTo(350, signY + 60).lineTo(500, signY + 60).stroke();
       
       // NOTA DE RODAPÉ
       doc.fontSize(8)
