@@ -83,5 +83,8 @@
 
 ## 🐛 Novo Bug Reportado - Alinhamento
 
-- [ ] Total Km e Valor/Km estão DENTRO da tabela (última linha) - devem estar ENTRE a tabela e "Total de Despesas" como texto simples
+- [x] Total Km e Valor/Km estão DENTRO da tabela (última linha) - devem estar ENTRE a tabela e "Total de Despesas" como texto simples - RESOLVIDO
+- [ ] Tabela mostra 3 linhas quando só há 1 registo - deve mostrar APENAS as linhas com dados (sem linhas vazias)
+- [ ] Assinatura do Responsável aparece ABAIXO da linha - deve estar ACIMA da linha de assinatura
+- [ ] Posicionamento geral das assinaturas pode estar desalinhado
 

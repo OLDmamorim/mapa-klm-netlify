@@ -182,9 +182,11 @@ async function generatePDF(relatorio) {
       
       doc.text('O Responsável:', 350, assY);
       if (assinaturaBuffer) {
-        doc.image(assinaturaBuffer, 350, assY + 10, { width: 120 });
+        // Assinatura ACIMA da linha (entre o texto e a linha)
+        doc.image(assinaturaBuffer, 380, assY + 10, { width: 80 });
       }
-      doc.moveTo(350, assY + 40).lineTo(490, assY + 40).stroke();
+      // Linha ABAIXO da assinatura
+      doc.moveTo(350, assY + 50).lineTo(490, assY + 50).stroke();
       
       // NOTA DE RODAPÉ
       doc.fontSize(8).font('Helvetica');

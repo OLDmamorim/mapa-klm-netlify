@@ -158,18 +158,6 @@ async function generatePDF(data) {
         yPos += 25;
       });
       
-      // Linhas vazias adicionais (mínimo 3 linhas)
-      const minRows = 3;
-      const currentRows = data.deslocacoes.length;
-      for (let i = 0; i < Math.max(0, minRows - currentRows); i++) {
-        xPos = 50;
-        colWidths.forEach((width) => {
-          doc.rect(xPos, yPos, width, 25).stroke();
-          xPos += width;
-        });
-        yPos += 25;
-      }
-      
       // Atualizar doc.y para a posição após a tabela
       doc.y = yPos + 30; // 30px de espaço após a última linha da tabela
       yPos = doc.y;
@@ -219,9 +207,11 @@ async function generatePDF(data) {
       // O Responsável
       doc.text('O Responsável:', 350, signY);
       if (assinaturaBuffer) {
-        doc.image(assinaturaBuffer, 350, signY + 5, { width: 120 });
+        // Assinatura ACIMA da linha (entre o texto e a linha)
+        doc.image(assinaturaBuffer, 380, signY + 10, { width: 80 });
       }
-      doc.moveTo(350, signY + 40).lineTo(500, signY + 40).stroke();
+      // Linha ABAIXO da assinatura
+      doc.moveTo(350, signY + 50).lineTo(500, signY + 50).stroke();
       
       // NOTA DE RODAPÉ
       doc.fontSize(8)
