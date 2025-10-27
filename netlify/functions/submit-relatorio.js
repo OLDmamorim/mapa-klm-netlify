@@ -120,6 +120,7 @@ async function generatePDF(data) {
       // Proprietário
       doc.text('Proprietário:', 50, doc.y);
       doc.rect(180, doc.y - 15, 365, 20).stroke();
+      doc.text(data.nome, 185, doc.y - 12);
       
       doc.moveDown(2);
       
@@ -144,8 +145,7 @@ async function generatePDF(data) {
       let yPos = tableTop + 25;
       
       data.deslocacoes.forEach((desl) => {
-        const [year, month, day] = data.data.split('-');
-        const dia = `${day}/${month}`;
+        const dia = data.data; // Usar data completa YYYY-MM-DD
         const rowData = [dia, '09H00', '18H00', desl.klm, desl.localidade, desl.motivo];
         
         xPos = 50;
@@ -201,7 +201,7 @@ async function generatePDF(data) {
       doc.fontSize(10)
          .font('Helvetica');
       doc.text('Observações:', 50, doc.y);
-      doc.rect(180, doc.y - 15, 365, 80).stroke();
+      doc.rect(180, doc.y - 15, 365, 60).stroke();
       
       doc.moveDown(6);
       

@@ -30,3 +30,26 @@
 
 - [x] Corrigir erro de timezone na submissão do formulário
 
+
+- [x] BUG CONFIRMADO: PDF ainda está usando formato antigo (sem logo, sem tabela, sem assinatura do responsável)
+  - [x] Código corrigido em download-pdf.js
+  - [ ] PENDENTE: Deploy no Netlify (deploy automático não está configurado)
+
+
+- [x] BUG: Não dá para fazer download do PDF no painel admin (corrigido parsing de data)
+
+
+- [x] Assinaturas estão presentes no PDF (página 2 - aceitável)
+
+
+
+## Correções Necessárias no PDF (comparando com template original)
+
+- [ ] Adicionar "part of Cary group" no logo (requer nova imagem do logo)
+- [x] Preencher campo "Centro de Custo" com a loja do colaborador
+- [x] Preencher campo "Proprietário" com o nome do colaborador
+- [x] Ajustar formato da data na tabela: usar "2025-05-30" em vez de "28/10"
+- [x] Reduzir espaçamentos para caber tudo numa página
+- [x] Reduzir altura da caixa de Observações (80px -> 60px)
+- [x] Assinatura do responsável já está como imagem (funcionando)
+

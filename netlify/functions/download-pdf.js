@@ -86,7 +86,7 @@ async function generatePDF(relatorio) {
       const dataStr = relatorio.data instanceof Date ? relatorio.data.toISOString().split('T')[0] : relatorio.data;
       const [year, month, day] = dataStr.split('-');
       const dataFormatada = `${day}/${month}/${year}`;
-      const diaTabela = `${day}/${month}`;
+      const diaTabela = dataStr; // Usar data completa YYYY-MM-DD
       
       doc.fontSize(10).font('Helvetica');
       doc.text('Data', 50, dataY);
@@ -99,7 +99,7 @@ async function generatePDF(relatorio) {
       
       doc.text('Proprietário:', 50, dataY + 70);
       doc.rect(150, dataY + 65, 400, 20).stroke();
-      // Proprietário fica vazio
+      doc.text(relatorio.colaborador_nome, 155, dataY + 70, { width: 390 });
       
       // TABELA
       const tableY = dataY + 110;
@@ -158,13 +158,13 @@ async function generatePDF(relatorio) {
       doc.text(`${totalDespesas.toFixed(2)} €`, 470, calcY + 60);
       
       // OBSERVAÇÕES
-      const obsY = calcY + 100;
+      const obsY = calcY + 60;
       doc.fontSize(10).font('Helvetica');
       doc.text('Observações:', 50, obsY);
-      doc.rect(180, obsY - 5, 370, 80).stroke();
+      doc.rect(180, obsY - 5, 370, 60).stroke();
       
       // ASSINATURAS
-      const assY = obsY + 100;
+      const assY = obsY + 80;
       doc.fontSize(10).font('Helvetica');
       doc.text('O Colaborador:', 80, assY);
       doc.moveTo(80, assY + 40).lineTo(220, assY + 40).stroke();
