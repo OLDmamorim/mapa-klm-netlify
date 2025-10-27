@@ -83,7 +83,8 @@ async function generatePDF(relatorio) {
       const dataY = despesasY + 30;
       
       // Parse da data
-      const [year, month, day] = relatorio.data.split('-');
+      const dataStr = relatorio.data instanceof Date ? relatorio.data.toISOString().split('T')[0] : relatorio.data;
+      const [year, month, day] = dataStr.split('-');
       const dataFormatada = `${day}/${month}/${year}`;
       const diaTabela = `${day}/${month}`;
       
@@ -227,7 +228,8 @@ exports.handler = async (event) => {
     
     await sql.end();
     
-    const [year, month, day] = relatorio.data.split('-');
+    const dataStr = relatorio.data instanceof Date ? relatorio.data.toISOString().split('T')[0] : relatorio.data;
+    const [year, month, day] = dataStr.split('-');
     const dataFormatada = `${day}-${month}-${year}`;
     
     return {
