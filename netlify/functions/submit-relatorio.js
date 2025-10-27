@@ -179,12 +179,15 @@ async function generatePDF(data) {
       const totalDespesas = totalKM * valorPorKm;
       
       doc.fontSize(10);
-      doc.text('Total Km', 350, yPos);
-      doc.text(totalKM.toFixed(2), 450, yPos);
+      doc.text('Total Km', 400, yPos);
+      doc.text(totalKM.toFixed(2), 490, yPos);
+      // Traço por baixo do Total Km
+      doc.moveTo(490, yPos + 15).lineTo(540, yPos + 15).stroke();
       
-      doc.moveDown(0.8);
-      doc.text('Valor/Km', 350, doc.y);
-      doc.text('0,36 €', 450, doc.y);
+      doc.text('Valor/Km', 400, yPos + 25);
+      doc.text(`${valorPorKm.toFixed(2)} €`, 490, yPos + 25);
+      // Traço por baixo do Valor/Km
+      doc.moveTo(490, yPos + 40).lineTo(540, yPos + 40).stroke();
       
       doc.moveDown(1.5);
       
@@ -203,14 +206,14 @@ async function generatePDF(data) {
       doc.text('Observações:', 50, doc.y);
       doc.rect(180, doc.y - 15, 365, 60).stroke();
       
-      doc.moveDown(6);
+      doc.moveDown(8);
       
-      // ASSINATURAS
+      // ASSINATURAS (mais separadas da nota final)
       const signY = doc.y + 20;
       
       // O Colaborador
       doc.text('O Colaborador:', 80, signY);
-      doc.moveTo(80, signY + 40).lineTo(230, signY + 40).stroke();
+      doc.moveTo(80, signY + 40).lineTo(250, signY + 40).stroke();
       
       // O Responsável
       doc.text('O Responsável:', 350, signY);

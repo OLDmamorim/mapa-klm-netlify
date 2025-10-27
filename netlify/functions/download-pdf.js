@@ -111,10 +111,10 @@ async function generatePDF(relatorio) {
       doc.fontSize(9).font('Helvetica-Bold');
       const headers = ['Dia', 'Saída', 'Chegada', "Km's", 'Local', 'Motivo'];
       
-      // Desenhar cabeçalho
+      // Desenhar cabeçalho (em negrito)
       for (let i = 0; i < headers.length; i++) {
         doc.rect(colX[i], tableY, colWidths[i], rowHeight).stroke();
-        doc.text(headers[i], colX[i] + 5, tableY + 10, { 
+        doc.font('Helvetica-Bold').text(headers[i], colX[i] + 5, tableY + 10, { 
           width: colWidths[i] - 10, 
           align: 'center' 
         });
@@ -153,11 +153,15 @@ async function generatePDF(relatorio) {
       const totalDespesas = totalKm * valorPorKm;
       
       doc.fontSize(10).font('Helvetica');
-      doc.text('Total Km', 350, calcY);
-      doc.text(totalKm.toFixed(2), 450, calcY);
+      doc.text('Total Km', 400, calcY);
+      doc.text(totalKm.toFixed(2), 490, calcY);
+      // Traço por baixo do Total Km
+      doc.moveTo(490, calcY + 15).lineTo(540, calcY + 15).stroke();
       
-      doc.text('Valor/Km', 350, calcY + 20);
-      doc.text(`${valorPorKm.toFixed(2)} €`, 450, calcY + 20);
+      doc.text('Valor/Km', 400, calcY + 25);
+      doc.text(`${valorPorKm.toFixed(2)} €`, 490, calcY + 25);
+      // Traço por baixo do Valor/Km
+      doc.moveTo(490, calcY + 40).lineTo(540, calcY + 40).stroke();
       
       doc.fontSize(11).font('Helvetica-Bold');
       doc.rect(260, calcY + 50, 290, 30).stroke();
@@ -170,11 +174,11 @@ async function generatePDF(relatorio) {
       doc.text('Observações:', 50, obsY);
       doc.rect(180, obsY - 5, 370, 60).stroke();
       
-      // ASSINATURAS
-      const assY = obsY + 80;
+      // ASSINATURAS (mais separadas da nota final)
+      const assY = obsY + 120;
       doc.fontSize(10).font('Helvetica');
       doc.text('O Colaborador:', 80, assY);
-      doc.moveTo(80, assY + 40).lineTo(220, assY + 40).stroke();
+      doc.moveTo(80, assY + 40).lineTo(250, assY + 40).stroke();
       
       doc.text('O Responsável:', 350, assY);
       if (assinaturaBuffer) {

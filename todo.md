@@ -60,3 +60,13 @@
 
 - [x] PDF só mostra uma deslocação quando o relatório tem múltiplas deslocações (RESOLVIDO)
 
+
+
+## 🎨 Ajustes Finais de Formatação do PDF
+
+- [x] Títulos da tabela em negrito (Dia, Saída, Chegada, Km's, Local, Motivo)
+- [x] Alinhar Total Km e Valor/Km com traços por baixo dos valores
+- [x] Separar mais as assinaturas da nota final do documento
+- [x] Alinhar os traços de assinatura (O Colaborador e O Responsável)
+- [x] Substituir assinatura do responsável pela assinatura correta em PNG
+
