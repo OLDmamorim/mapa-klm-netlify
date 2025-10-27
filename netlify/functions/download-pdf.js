@@ -120,28 +120,35 @@ async function generatePDF(relatorio) {
         });
       }
       
-      // Linha de dados
+      // Linhas de dados - iterar sobre TODAS as deslocações
       doc.font('Helvetica');
-      const dataRow = [
-        diaTabela,
-        '09H00',
-        '18H00',
-        relatorio.klm.toString(),
-        relatorio.localidade,
-        relatorio.motivo
-      ];
+      const deslocacoes = relatorio.deslocacoes || [relatorio];
+      let currentRowY = tableY + rowHeight;
       
-      for (let i = 0; i < dataRow.length; i++) {
-        doc.rect(colX[i], tableY + rowHeight, colWidths[i], rowHeight).stroke();
-        doc.text(dataRow[i], colX[i] + 5, tableY + rowHeight + 10, { 
-          width: colWidths[i] - 10, 
-          align: i < 4 ? 'center' : 'left'
-        });
-      }
+      deslocacoes.forEach((desl) => {
+        const dataRow = [
+          diaTabela,
+          '09H00',
+          '18H00',
+          desl.klm.toString(),
+          desl.localidade,
+          desl.motivo
+        ];
+        
+        for (let i = 0; i < dataRow.length; i++) {
+          doc.rect(colX[i], currentRowY, colWidths[i], rowHeight).stroke();
+          doc.text(dataRow[i], colX[i] + 5, currentRowY + 10, { 
+            width: colWidths[i] - 10, 
+            align: i < 4 ? 'center' : 'left'
+          });
+        }
+        
+        currentRowY += rowHeight;
+      });
       
       // CÁLCULOS
-      const calcY = tableY + rowHeight * 2 + 20;
-      const totalKm = parseFloat(relatorio.klm);
+      const calcY = currentRowY + 20;
+      const totalKm = deslocacoes.reduce((sum, d) => sum + parseFloat(d.klm), 0);
       const valorPorKm = 0.36;
       const totalDespesas = totalKm * valorPorKm;
       
@@ -211,6 +218,7 @@ exports.handler = async (event) => {
     
     const sql = postgres(process.env.DATABASE_URL, { ssl: 'prefer' });
     
+    // Buscar o relatório principal pelo ID
     const relatorios = await sql`
       SELECT * FROM relatorios WHERE id = ${relatorioId}
     `;
@@ -224,6 +232,18 @@ exports.handler = async (event) => {
     }
     
     const relatorio = relatorios[0];
+    
+    // Buscar TODAS as deslocações do mesmo relatório (mesma data + colaborador + matrícula)
+    const todasDeslocacoes = await sql`
+      SELECT * FROM relatorios 
+      WHERE data = ${relatorio.data}
+        AND colaborador_codigo = ${relatorio.colaborador_codigo}
+        AND matricula = ${relatorio.matricula}
+      ORDER BY id
+    `;
+    
+    // Adicionar array de deslocações ao relatório principal
+    relatorio.deslocacoes = todasDeslocacoes;
     const pdfBuffer = await generatePDF(relatorio);
     
     await sql.end();
