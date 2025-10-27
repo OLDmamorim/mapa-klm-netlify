@@ -45,7 +45,7 @@
 
 ## Correções Necessárias no PDF (comparando com template original)
 
-- [ ] Adicionar "part of Cary group" no logo (requer nova imagem do logo)
+- [x] Adicionar "part of Cary group" no logo (nova imagem fornecida)
 - [x] Preencher campo "Centro de Custo" com a loja do colaborador
 - [x] Preencher campo "Proprietário" com o nome do colaborador
 - [x] Ajustar formato da data na tabela: usar "2025-05-30" em vez de "28/10"
