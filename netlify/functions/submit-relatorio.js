@@ -170,7 +170,8 @@ async function generatePDF(data) {
         yPos += 25;
       }
       
-      doc.moveDown(2);
+      // Atualizar doc.y para a posição após a tabela
+      doc.y = yPos + 30; // 30px de espaço após a última linha da tabela
       yPos = doc.y;
       
       // CÁLCULOS
