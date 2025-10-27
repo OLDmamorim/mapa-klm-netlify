@@ -218,7 +218,7 @@ async function generatePDF(data) {
       // O Responsável
       doc.text('O Responsável:', 350, signY);
       if (assinaturaBuffer) {
-        doc.image(assinaturaBuffer, 350, signY + 5, { width: 120, height: 30 });
+        doc.image(assinaturaBuffer, 350, signY + 5, { width: 120 });
       }
       doc.moveTo(350, signY + 40).lineTo(500, signY + 40).stroke();
       

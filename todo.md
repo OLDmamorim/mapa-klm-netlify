@@ -70,3 +70,11 @@
 - [x] Alinhar os traços de assinatura (O Colaborador e O Responsável)
 - [x] Substituir assinatura do responsável pela assinatura correta em PNG
 
+
+
+## 🐛 Bugs Reportados - Correções Urgentes
+
+- [x] Total Km está DENTRO da tabela (última linha) - deve estar FORA da tabela (Código já estava correto)
+- [x] Campo Proprietário está vazio - deve mostrar o nome do utilizador (Corrigido: JOIN com tabela colaboradores)
+- [x] Assinatura do responsável está distorcida (itálico/inclinada) - deve estar normal (Corrigido: removido height fixo)
+

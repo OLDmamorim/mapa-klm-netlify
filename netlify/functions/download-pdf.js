@@ -182,7 +182,7 @@ async function generatePDF(relatorio) {
       
       doc.text('O Responsável:', 350, assY);
       if (assinaturaBuffer) {
-        doc.image(assinaturaBuffer, 350, assY + 10, { width: 120, height: 30 });
+        doc.image(assinaturaBuffer, 350, assY + 10, { width: 120 });
       }
       doc.moveTo(350, assY + 40).lineTo(490, assY + 40).stroke();
       
@@ -222,9 +222,12 @@ exports.handler = async (event) => {
     
     const sql = postgres(process.env.DATABASE_URL, { ssl: 'prefer' });
     
-    // Buscar o relatório principal pelo ID
+    // Buscar o relatório principal pelo ID com nome do colaborador
     const relatorios = await sql`
-      SELECT * FROM relatorios WHERE id = ${relatorioId}
+      SELECT r.*, c.nome as colaborador_nome 
+      FROM relatorios r
+      LEFT JOIN colaboradores c ON r.colaborador_codigo = c.codigo
+      WHERE r.id = ${relatorioId}
     `;
     
     if (relatorios.length === 0) {
@@ -239,11 +242,13 @@ exports.handler = async (event) => {
     
     // Buscar TODAS as deslocações do mesmo relatório (mesma data + colaborador + matrícula)
     const todasDeslocacoes = await sql`
-      SELECT * FROM relatorios 
-      WHERE data = ${relatorio.data}
-        AND colaborador_codigo = ${relatorio.colaborador_codigo}
-        AND matricula = ${relatorio.matricula}
-      ORDER BY id
+      SELECT r.*, c.nome as colaborador_nome
+      FROM relatorios r
+      LEFT JOIN colaboradores c ON r.colaborador_codigo = c.codigo
+      WHERE r.data = ${relatorio.data}
+        AND r.colaborador_codigo = ${relatorio.colaborador_codigo}
+        AND r.matricula = ${relatorio.matricula}
+      ORDER BY r.id
     `;
     
     // Adicionar array de deslocações ao relatório principal
