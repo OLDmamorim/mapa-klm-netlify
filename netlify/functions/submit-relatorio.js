@@ -193,12 +193,12 @@ async function generatePDF(data) {
       doc.fontSize(10)
          .font('Helvetica');
       doc.text('Observações:', 50, doc.y);
-      doc.rect(180, doc.y - 15, 365, 60).stroke();
+      doc.rect(180, doc.y - 15, 365, 40).stroke();
       
-      doc.moveDown(8);
+      doc.moveDown(4);
       
       // ASSINATURAS (mais separadas da nota final)
-      const signY = doc.y + 10;
+      const signY = doc.y + 5;
       
       // O Colaborador
       doc.text('O Colaborador:', 80, signY);

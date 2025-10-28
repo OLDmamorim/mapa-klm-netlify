@@ -105,6 +105,15 @@
 
 ## 🔧 Ajustes Finais de Layout
 
-- [ ] Linhas de assinatura (Colaborador e Responsável) devem subir mais, ficando mais próximas da caixa de Observações
-- [ ] Nota de rodapé deve estar SEMPRE na página 1 (no fim da página), nunca numa segunda página
+- [x] Linhas de assinatura (Colaborador e Responsável) devem subir mais, ficando mais próximas da caixa de Observações - RESOLVIDO
+- [x] Nota de rodapé deve estar SEMPRE na página 1 (no fim da página), nunca numa segunda página - RESOLVIDO
+
+
+
+
+## 🚨 URGENTE - Espaçamento Excessivo
+
+- [ ] Caixa de Observações está ENORME - reduzir altura drasticamente (de 60px para 40px)
+- [ ] Espaço entre Observações e Assinaturas está muito grande - reduzir de 80px para 30px
+- [ ] Todo o layout precisa ser mais compacto para caber confortavelmente numa página
 

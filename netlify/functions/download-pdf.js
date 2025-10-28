@@ -172,10 +172,10 @@ async function generatePDF(relatorio) {
       const obsY = calcY + 60;
       doc.fontSize(10).font('Helvetica');
       doc.text('Observações:', 50, obsY);
-      doc.rect(180, obsY - 5, 370, 60).stroke();
+      doc.rect(180, obsY - 5, 370, 40).stroke();
       
       // ASSINATURAS (mais separadas da nota final)
-      const assY = obsY + 80;
+      const assY = obsY + 50;
       doc.fontSize(10).font('Helvetica');
       doc.text('O Colaborador:', 80, assY);
       doc.moveTo(80, assY + 40).lineTo(250, assY + 40).stroke();
