@@ -129,5 +129,12 @@
 
 ## 🔧 Simplificação do Layout
 
-- [ ] Remover completamente a caixa de Observações do PDF - está a causar problemas de layout e não é essencial
+- [x] Remover completamente a caixa de Observações do PDF - está a causar problemas de layout e não é essencial - RESOLVIDO
+
+
+
+
+## 🚨 BUG CRÍTICO - Sobreposição de Elementos
+
+- [ ] Caixa "Total de Despesas" está SOBREPOSTA à assinatura do Responsável - precisa ajustar posicionamento vertical dos elementos
 

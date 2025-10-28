@@ -168,8 +168,8 @@ async function generatePDF(relatorio) {
       doc.text('Total de Despesas:', 270, calcY + 60);
       doc.text(`${totalDespesas.toFixed(2)} €`, 470, calcY + 60);
       
-      // ASSINATURAS (mais separadas da nota final)
-      const assY = calcY + 40;
+      // ASSINATURAS (mais separadas da nota final) - ABAIXO da caixa de Total de Despesas
+      const assY = calcY + 110;
       doc.fontSize(10).font('Helvetica');
       doc.text('O Colaborador:', 80, assY);
       doc.moveTo(80, assY + 40).lineTo(250, assY + 40).stroke();

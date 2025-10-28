@@ -183,13 +183,14 @@ async function generatePDF(data) {
       // Total de Despesas (caixa destacada)
       doc.fontSize(11)
          .font('Helvetica-Bold');
-      doc.rect(260, doc.y, 285, 30).stroke();
-      doc.text('Total de Despesas:', 270, doc.y + 10);
-      doc.text(`${totalDespesas.toFixed(2)} €`, 480, doc.y - 10, { align: 'right' });
+      const despesasY = doc.y;
+      doc.rect(260, despesasY, 285, 30).stroke();
+      doc.text('Total de Despesas:', 270, despesasY + 10);
+      doc.text(`${totalDespesas.toFixed(2)} €`, 480, despesasY + 10, { align: 'right' });
       
+      // Atualizar doc.y para DEPOIS da caixa de Total de Despesas
+      doc.y = despesasY + 30;
       doc.moveDown(3);
-      
-      doc.moveDown(2);
       
       // ASSINATURAS (mais separadas da nota final)
       const signY = doc.y + 5;
