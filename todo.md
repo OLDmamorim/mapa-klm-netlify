@@ -158,9 +158,7 @@
 
 ## 🚨 BUG CRÍTICO - PDF com 3 páginas
 
-- [ ] PDF está a gerar 3 páginas em vez de 1 - a nota de rodapé está a ser quebrada em múltiplas páginas
-  - Página 1: Conteúdo principal (identificação, tabela, assinaturas)
-  - Página 2: Primeira parte da nota ("Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e")
-  - Página 3: Segunda parte da nota ("31 do mês N serão pagos no mês N+1")
-  - PROBLEMA: A nota de rodapé está a ser renderizada com quebras de linha ou espaçamento excessivo
+- [x] PDF está a gerar 3 páginas em vez de 1 - a nota de rodapé está a ser quebrada em múltiplas páginas - RESOLVIDO
+  - Solução: Reduzir fonte para 7pt, aumentar largura para 750, desativar quebras de linha (lineBreak: false), ajustar posição Y para 740
+  - Resultado: PDF agora tem apenas 1 página com nota de rodapé completa numa única linha
 
