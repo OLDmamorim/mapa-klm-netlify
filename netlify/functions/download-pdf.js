@@ -184,6 +184,7 @@ async function generatePDF(relatorio) {
       doc.moveTo(350, assY + 60).lineTo(490, assY + 60).stroke();
       
       // Nota de rodapé - posição relativa às assinaturas (garante que fica dentro da página 1)
+      // VERSÃO FINAL CORRIGIDA - 28/10/2025 12:00 - SEM PARÂMETRO WIDTH
       const noteY = assY + 75; // 75px abaixo das assinaturas (logo após os traços)
       doc.fontSize(6).font('Helvetica'); // Fonte muito pequena para garantir que cabe numa linha
       doc.text(
