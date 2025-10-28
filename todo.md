@@ -147,3 +147,9 @@
 - [x] Traços das assinaturas desalinhados - o traço do Colaborador e do Responsável devem estar na mesma altura (alinhados horizontalmente) - RESOLVIDO
 - [x] PDF tem 2 páginas em vez de 1 - nota de rodapé está a forçar segunda página, precisa ajustar posicionamento geral - RESOLVIDO (reduzidos espaçamentos: assY=70px, noteY=75px)
 
+
+
+## 🔧 Ajuste Final - Nota de Rodapé
+
+- [ ] Nota de rodapé deve estar fixa no rodapé da página (fim absoluto da página A4, ~30px do fim), não logo abaixo das assinaturas
+
