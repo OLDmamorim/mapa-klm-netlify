@@ -162,3 +162,14 @@
   - Solução: Reduzir fonte para 7pt, aumentar largura para 750, desativar quebras de linha (lineBreak: false), ajustar posição Y para 740
   - Resultado: PDF agora tem apenas 1 página com nota de rodapé completa numa única linha
 
+
+
+
+## 🚨 BUG CRÍTICO - Nota de rodapé continua a criar 2ª e 3ª páginas
+
+- [ ] Nota de rodapé está a ser quebrada em múltiplas páginas mesmo com lineBreak: false
+  - Página 2: "Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e"
+  - Página 3: "31 do mês N serão pagos no mês N+1"
+  - Cliente quer nota TOTALMENTE FIXA no rodapé, como se fizesse parte do fundo da folha (footer fixo)
+  - Solução: Reduzir fonte para 6pt, largura para 600, posição Y=800, garantir lineBreak: false e continued: false
+
