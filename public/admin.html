@@ -357,6 +357,7 @@
                         <td>${new Date(r.created_at).toLocaleString('pt-PT')}</td>
                         <td>
                             <button class="btn btn-edit" onclick="downloadPDF(${r.id})">Download PDF</button>
+                            <button class="btn btn-delete" onclick="deleteRelatorio(${r.id})">Eliminar</button>
                         </td>
                     </tr>
                 `).join('');
@@ -409,6 +410,29 @@
             } catch (error) {
                 console.error('Erro:', error);
                 alert('Erro ao adicionar colaborador');
+            }
+        }
+        
+        async function deleteRelatorio(relatorioId) {
+            if (!confirm('Tem a certeza que deseja eliminar este relatório?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/.netlify/functions/delete-relatorio?id=${relatorioId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('Relatório eliminado com sucesso!');
+                    loadRelatorios();
+                } else {
+                    const error = await response.json();
+                    alert('Erro ao eliminar relatório: ' + (error.error || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao eliminar relatório');
             }
         }
         
