@@ -143,7 +143,7 @@
 
 ## 🔧 Ajustes Finais para Perfeição
 
-- [ ] Centro de Custo (loja) está vazio - query SQL não está a retornar a loja corretamente
+- [x] Centro de Custo (loja) está vazio - query SQL não está a retornar a loja corretamente - RESOLVIDO (adicionada loja ao objeto relatorio antes de gerar PDF)
 - [x] Traços das assinaturas desalinhados - o traço do Colaborador e do Responsável devem estar na mesma altura (alinhados horizontalmente) - RESOLVIDO
-- [ ] PDF tem 2 páginas em vez de 1 - nota de rodapé está a forçar segunda página, precisa ajustar posicionamento geral
+- [x] PDF tem 2 páginas em vez de 1 - nota de rodapé está a forçar segunda página, precisa ajustar posicionamento geral - RESOLVIDO (reduzidos espaçamentos: assY=70px, noteY=75px)
 
