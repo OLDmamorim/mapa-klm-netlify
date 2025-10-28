@@ -113,14 +113,21 @@
 
 ## 🚨 URGENTE - Espaçamento Excessivo
 
-- [ ] Caixa de Observações está ENORME - reduzir altura drasticamente (de 60px para 40px)
-- [ ] Espaço entre Observações e Assinaturas está muito grande - reduzir de 80px para 30px
-- [ ] Todo o layout precisa ser mais compacto para caber confortavelmente numa página
+- [x] Caixa de Observações está ENORME - reduzir altura drasticamente (de 60px para 40px) - RESOLVIDO
+- [x] Espaço entre Observações e Assinaturas está muito grande - reduzir de 80px para 30px - RESOLVIDO
+- [x] Todo o layout precisa ser mais compacto para caber confortavelmente numa página - RESOLVIDO
 
 
 
 
 ## 🚨 BUG CRÍTICO - Relatórios Duplicados
 
-- [ ] Sistema cria múltiplos relatórios quando há múltiplas deslocações - deveria criar UM único relatório com TODAS as deslocações do mesmo dia/colaborador
+- [x] Sistema cria múltiplos relatórios quando há múltiplas deslocações - deveria criar UM único relatório com TODAS as deslocações do mesmo dia/colaborador - RESOLVIDO
+
+
+
+
+## 🔧 Simplificação do Layout
+
+- [ ] Remover completamente a caixa de Observações do PDF - está a causar problemas de layout e não é essencial
 

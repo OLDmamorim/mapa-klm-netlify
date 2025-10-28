@@ -189,13 +189,7 @@ async function generatePDF(data) {
       
       doc.moveDown(3);
       
-      // OBSERVAÇÕES
-      doc.fontSize(10)
-         .font('Helvetica');
-      doc.text('Observações:', 50, doc.y);
-      doc.rect(180, doc.y - 15, 365, 40).stroke();
-      
-      doc.moveDown(4);
+      doc.moveDown(2);
       
       // ASSINATURAS (mais separadas da nota final)
       const signY = doc.y + 5;
