@@ -92,5 +92,11 @@
 
 ## 🐛 Bug Final - Linha de Assinatura
 
-- [ ] Linha de assinatura do Responsável está desalinhada - a assinatura sobrepõe-se à linha. A linha deve estar completamente ABAIXO da assinatura
+- [x] Linha de assinatura do Responsável está desalinhada - a assinatura sobrepõe-se à linha. A linha deve estar completamente ABAIXO da assinatura - RESOLVIDO
+
+
+
+## 🐛 Bug - Nota de Rodapé
+
+- [ ] Nota de rodapé está a sobrepor-se à linha de assinatura do Colaborador - deve estar ABAIXO das assinaturas
 
