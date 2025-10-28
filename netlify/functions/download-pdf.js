@@ -169,7 +169,7 @@ async function generatePDF(relatorio) {
       doc.text(`${totalDespesas.toFixed(2)} €`, 470, calcY + 60);
       
       // ASSINATURAS (mais separadas da nota final) - ABAIXO da caixa de Total de Despesas
-      const assY = calcY + 90; // Reduzido de 110 para 90 para economizar espaço
+      const assY = calcY + 70; // Reduzido para 70 para economizar espaço e caber tudo numa página
       doc.fontSize(10).font('Helvetica');
       doc.text('O Colaborador:', 80, assY);
       // Linha alinhada com a do Responsável (60px)
@@ -184,7 +184,7 @@ async function generatePDF(relatorio) {
       doc.moveTo(350, assY + 60).lineTo(490, assY + 60).stroke();
       
       // NOTA DE RODAPÉ (posicionada logo ABAIXO das assinaturas, não no fim da página)
-      const noteY = assY + 85; // 85px abaixo do início das assinaturas (25px abaixo das linhas)
+      const noteY = assY + 75; // 75px abaixo do início das assinaturas (15px abaixo das linhas)
       doc.fontSize(8).font('Helvetica');
       doc.text(
         'Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e 31 do mês N serão pagos no mês N+1',
