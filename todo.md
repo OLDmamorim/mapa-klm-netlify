@@ -167,7 +167,9 @@
 
 ## 🚨 BUG CRÍTICO - Nota de rodapé continua a criar 2ª e 3ª páginas
 
-- [x] Nota de rodapé está a ser quebrada em múltiplas páginas mesmo com lineBreak: false - RESOLVIDO
-  - Solução final: Usar posição relativa (assY + 75) em vez de fixa (Y=800), remover parâmetro width, manter lineBreak: false e continued: false, fonte 6pt
+- [x] Nota de rodapé está a ser quebrada em múltiplas páginas mesmo com lineBreak: false - RESOLVIDO DEFINITIVAMENTE
+  - Solução final: Usar posição relativa (assY + 75) em vez de fixa (Y=800), REMOVER PARÂMETRO WIDTH (era este o problema!), manter lineBreak: false e continued: false, fonte 6pt
   - Resultado: PDF tem apenas 1 página com nota de rodapé completa numa única linha, logo abaixo das assinaturas
+  - Testado com relatório do Alberto Mendes (ID 42, 1 deslocação) após forçar redeploy no Netlify - PASSOU COM 100% DE SUCESSO!
+  - Nota: O Netlify estava com cache e não aplicava as alterações. Foi necessário forçar redeploy com commit vazio.
 
