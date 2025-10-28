@@ -197,7 +197,8 @@ async function generatePDF(data) {
       
       // O Colaborador
       doc.text('O Colaborador:', 80, signY);
-      doc.moveTo(80, signY + 40).lineTo(250, signY + 40).stroke();
+      // Linha alinhada com a do Responsável (60px)
+      doc.moveTo(80, signY + 60).lineTo(250, signY + 60).stroke();
       
       // O Responsável
       doc.text('O Responsável:', 350, signY);
@@ -208,8 +209,8 @@ async function generatePDF(data) {
       // Linha ABAIXO da assinatura (60px para garantir espaço suficiente)
       doc.moveTo(350, signY + 60).lineTo(500, signY + 60).stroke();
       
-      // NOTA DE RODAPÉ (posicionada no fim da página 1)
-      const noteY = doc.page.height - 60;
+      // NOTA DE RODAPÉ (posicionada no fim da página 1, mais abaixo)
+      const noteY = doc.page.height - 40;
       doc.fontSize(8)
          .font('Helvetica')
          .text('Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e', 50, noteY);

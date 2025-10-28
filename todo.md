@@ -136,5 +136,14 @@
 
 ## 🚨 BUG CRÍTICO - Sobreposição de Elementos
 
-- [ ] Caixa "Total de Despesas" está SOBREPOSTA à assinatura do Responsável - precisa ajustar posicionamento vertical dos elementos
+- [x] Caixa "Total de Despesas" está SOBREPOSTA à assinatura do Responsável - precisa ajustar posicionamento vertical dos elementos - RESOLVIDO
+
+
+
+
+## 🔧 Ajustes Finais para Perfeição
+
+- [ ] Centro de Custo (loja) está vazio - deve preencher com a loja do colaborador
+- [ ] Nota de rodapé precisa descer mais - ficar fixo no fundo da página
+- [ ] Traços das assinaturas desalinhados - o traço do Colaborador e do Responsável devem estar na mesma altura (alinhados horizontalmente)
 

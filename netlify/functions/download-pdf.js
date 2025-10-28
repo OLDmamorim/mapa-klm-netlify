@@ -172,7 +172,8 @@ async function generatePDF(relatorio) {
       const assY = calcY + 110;
       doc.fontSize(10).font('Helvetica');
       doc.text('O Colaborador:', 80, assY);
-      doc.moveTo(80, assY + 40).lineTo(250, assY + 40).stroke();
+      // Linha alinhada com a do Responsável (60px)
+      doc.moveTo(80, assY + 60).lineTo(250, assY + 60).stroke();
       
       doc.text('O Responsável:', 350, assY);
       if (assinaturaBuffer) {
@@ -182,8 +183,8 @@ async function generatePDF(relatorio) {
       // Linha ABAIXO da assinatura (60px para garantir espaço suficiente)
       doc.moveTo(350, assY + 60).lineTo(490, assY + 60).stroke();
       
-      // NOTA DE RODAPÉ (posicionada no fim da página 1)
-      const noteY = doc.page.height - 60;
+      // NOTA DE RODAPÉ (posicionada no fim da página 1, mais abaixo)
+      const noteY = doc.page.height - 40;
       doc.fontSize(8).font('Helvetica');
       doc.text(
         'Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e 31 do mês N serão pagos no mês N+1',
@@ -239,7 +240,7 @@ exports.handler = async (event) => {
     
     // Buscar TODAS as deslocações do mesmo relatório (mesma data + colaborador + matrícula)
     const todasDeslocacoes = await sql`
-      SELECT r.*, c.nome as colaborador_nome
+      SELECT r.*, c.nome as colaborador_nome, c.loja
       FROM relatorios r
       LEFT JOIN colaboradores c ON r.colaborador_codigo = c.codigo
       WHERE r.data = ${relatorio.data}
