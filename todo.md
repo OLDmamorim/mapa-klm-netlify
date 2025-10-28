@@ -117,3 +117,10 @@
 - [ ] Espaço entre Observações e Assinaturas está muito grande - reduzir de 80px para 30px
 - [ ] Todo o layout precisa ser mais compacto para caber confortavelmente numa página
 
+
+
+
+## 🚨 BUG CRÍTICO - Relatórios Duplicados
+
+- [ ] Sistema cria múltiplos relatórios quando há múltiplas deslocações - deveria criar UM único relatório com TODAS as deslocações do mesmo dia/colaborador
+
