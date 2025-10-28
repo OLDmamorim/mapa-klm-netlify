@@ -183,16 +183,15 @@ async function generatePDF(relatorio) {
       // Linha ABAIXO da assinatura (60px para garantir espaço suficiente)
       doc.moveTo(350, assY + 60).lineTo(490, assY + 60).stroke();
       
-      // NOTA DE RODAPÉ (fixa no rodapé da página A4, mas sem forçar segunda página)
-      const noteY = 750; // Posição fixa no rodapé (~90px do fim da página A4)
-      doc.fontSize(8).font('Helvetica');
+      // Nota de rodapé - fixa no rodapé da página (fonte menor para caber numa linha)
+      const noteY = 740;
+      doc.fontSize(7).font('Helvetica');
       doc.text(
         'Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e 31 do mês N serão pagos no mês N+1',
         50,
         noteY,
-        { width: 500, align: 'left' }
-      );
-      
+        { width: 750, align: 'left', lineBreak: false }
+      );    
       doc.end();
     } catch (error) {
       reject(error);

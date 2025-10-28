@@ -153,3 +153,14 @@
 
 - [x] Nota de rodapé deve estar fixa no rodapé da página (fim absoluto da página A4, ~30px do fim), não logo abaixo das assinaturas - RESOLVIDO (posição fixa Y=750, ~90px do fim da página)
 
+
+
+
+## 🚨 BUG CRÍTICO - PDF com 3 páginas
+
+- [ ] PDF está a gerar 3 páginas em vez de 1 - a nota de rodapé está a ser quebrada em múltiplas páginas
+  - Página 1: Conteúdo principal (identificação, tabela, assinaturas)
+  - Página 2: Primeira parte da nota ("Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e")
+  - Página 3: Segunda parte da nota ("31 do mês N serão pagos no mês N+1")
+  - PROBLEMA: A nota de rodapé está a ser renderizada com quebras de linha ou espaçamento excessivo
+
