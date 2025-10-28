@@ -190,7 +190,7 @@ async function generatePDF(relatorio) {
         'Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e 31 do mês N serão pagos no mês N+1',
         50,
         noteY,
-        { width: 600, align: 'left', lineBreak: false, continued: false }
+        { lineBreak: false, continued: false }
       );    
       doc.end();
     } catch (error) {
