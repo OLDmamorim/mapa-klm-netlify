@@ -143,7 +143,7 @@
 
 ## 🔧 Ajustes Finais para Perfeição
 
-- [ ] Centro de Custo (loja) está vazio - deve preencher com a loja do colaborador
-- [ ] Nota de rodapé precisa descer mais - ficar fixo no fundo da página
-- [ ] Traços das assinaturas desalinhados - o traço do Colaborador e do Responsável devem estar na mesma altura (alinhados horizontalmente)
+- [ ] Centro de Custo (loja) está vazio - query SQL não está a retornar a loja corretamente
+- [x] Traços das assinaturas desalinhados - o traço do Colaborador e do Responsável devem estar na mesma altura (alinhados horizontalmente) - RESOLVIDO
+- [ ] PDF tem 2 páginas em vez de 1 - nota de rodapé está a forçar segunda página, precisa ajustar posicionamento geral
 
