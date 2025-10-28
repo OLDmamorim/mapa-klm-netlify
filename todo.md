@@ -173,3 +173,15 @@
   - Testado com relatório do Alberto Mendes (ID 42, 1 deslocação) após forçar redeploy no Netlify - PASSOU COM 100% DE SUCESSO!
   - Nota: O Netlify estava com cache e não aplicava as alterações. Foi necessário forçar redeploy com commit vazio.
 
+
+
+
+## 🚨🚨🚨 BUG CRÍTICO PERSISTENTE - PDF CONTINUA COM 3 PÁGINAS
+
+- [ ] PDF AINDA está a gerar 3 páginas mesmo após todas as correções aplicadas
+  - Página 1: Conteúdo principal
+  - Página 2: Primeira parte da nota
+  - Página 3: Segunda parte da nota
+  - **PROBLEMA REAL**: O parâmetro `lineBreak: false` NÃO está a funcionar com PDFKit
+  - **SOLUÇÃO NECESSÁRIA**: REMOVER COMPLETAMENTE A NOTA DE RODAPÉ ou encontrar alternativa que funcione
+
