@@ -98,5 +98,13 @@
 
 ## 🐛 Bug - Nota de Rodapé
 
-- [ ] Nota de rodapé está a sobrepor-se à linha de assinatura do Colaborador - deve estar ABAIXO das assinaturas
+- [x] Nota de rodapé está a sobrepor-se à linha de assinatura do Colaborador - deve estar ABAIXO das assinaturas - RESOLVIDO
+
+
+
+
+## 🔧 Ajustes Finais de Layout
+
+- [ ] Linhas de assinatura (Colaborador e Responsável) devem subir mais, ficando mais próximas da caixa de Observações
+- [ ] Nota de rodapé deve estar SEMPRE na página 1 (no fim da página), nunca numa segunda página
 

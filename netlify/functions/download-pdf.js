@@ -175,7 +175,7 @@ async function generatePDF(relatorio) {
       doc.rect(180, obsY - 5, 370, 60).stroke();
       
       // ASSINATURAS (mais separadas da nota final)
-      const assY = obsY + 120;
+      const assY = obsY + 80;
       doc.fontSize(10).font('Helvetica');
       doc.text('O Colaborador:', 80, assY);
       doc.moveTo(80, assY + 40).lineTo(250, assY + 40).stroke();
@@ -188,12 +188,13 @@ async function generatePDF(relatorio) {
       // Linha ABAIXO da assinatura (60px para garantir espaço suficiente)
       doc.moveTo(350, assY + 60).lineTo(490, assY + 60).stroke();
       
-      // NOTA DE RODAPÉ (posicionada ABAIXO das assinaturas)
+      // NOTA DE RODAPÉ (posicionada no fim da página 1)
+      const noteY = doc.page.height - 60;
       doc.fontSize(8).font('Helvetica');
       doc.text(
         'Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e 31 do mês N serão pagos no mês N+1',
         50,
-        assY + 80,
+        noteY,
         { width: 500, align: 'left' }
       );
       
