@@ -190,7 +190,7 @@ async function generatePDF(data) {
       
       // Atualizar doc.y para DEPOIS da caixa de Total de Despesas
       doc.y = despesasY + 30;
-      doc.moveDown(3);
+      doc.moveDown(4);
       
       // ASSINATURAS (mais separadas da nota final)
       const signY = doc.y + 5;
