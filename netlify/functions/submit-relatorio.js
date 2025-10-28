@@ -99,16 +99,7 @@ async function generatePDF(data) {
       
       doc.moveDown(1);
       
-      // Data
-      doc.fontSize(10)
-         .font('Helvetica')
-         .text('Data', 50, doc.y);
-      doc.rect(180, doc.y - 15, 150, 20).stroke();
-      const [year, month, day] = data.data.split('-');
-      const dataFormatada = `${day}/${month}/${year}`;
-      doc.text(dataFormatada, 185, doc.y - 12);
-      
-      doc.moveDown(1.5);
+      doc.moveDown(0.5);
       
       // Matrícula
       doc.text('Matrícula:', 50, doc.y);
@@ -145,8 +136,9 @@ async function generatePDF(data) {
       let yPos = tableTop + 25;
       
       data.deslocacoes.forEach((desl) => {
-        const dia = data.data; // Usar data completa YYYY-MM-DD
-        const rowData = [dia, '09H00', '18H00', desl.klm, desl.localidade, desl.motivo];
+        const [year, month, day] = desl.data.split('-');
+        const diaFormatado = `${day}/${month}/${year}`;
+        const rowData = [diaFormatado, '09H00', '18H00', desl.klm, desl.localidade, desl.motivo];
         
         xPos = 50;
         rowData.forEach((cell, i) => {
@@ -243,10 +235,10 @@ async function sendEmail(pdfBuffer, data) {
   const mailOptions = {
     from: process.env.SMTP_USER,
     to: process.env.ADMIN_EMAIL || 'mamorim@expressglass.pt',
-    subject: `MAPA KLM - ${data.colaborador_nome} - ${data.data.split('-').reverse().join('/')}`,
-    text: `Novo relatório de KM submetido por ${data.colaborador_nome}.\n\nDetalhes:\n- Data: ${data.data.split('-').reverse().join('/')}\n- Loja: ${data.loja}\n- Matrícula: ${data.matricula}\n- Localidades: ${localidades}\n- Total KM: ${totalKM.toFixed(2)} km\n- Total Despesas: ${totalDespesas} €\n- Número de deslocações: ${data.deslocacoes.length}`,
+    subject: `MAPA KLM - ${data.colaborador_nome}`,
+    text: `Novo relatório de KM submetido por ${data.colaborador_nome}.\n\nDetalhes:\n- Loja: ${data.loja}\n- Matrícula: ${data.matricula}\n- Localidades: ${localidades}\n- Total KM: ${totalKM.toFixed(2)} km\n- Total Despesas: ${totalDespesas} €\n- Número de deslocações: ${data.deslocacoes.length}`,
     attachments: [{
-      filename: `Relatorio_${data.colaborador_nome.replace(/ /g, '')}_${data.data}.pdf`,
+      filename: `Relatorio_${data.colaborador_nome.replace(/ /g, '')}_${new Date().toISOString().split('T')[0]}.pdf`,
       content: pdfBuffer
     }]
   };
@@ -284,7 +276,7 @@ exports.handler = async (event, context) => {
             data, colaborador_codigo, colaborador_nome, matricula, 
             localidade, motivo, klm
           ) VALUES (
-            ${data.data}, ${data.colaborador_codigo}, ${data.colaborador_nome},
+            ${desl.data}, ${data.colaborador_codigo}, ${data.colaborador_nome},
             ${data.matricula}, ${desl.localidade}, ${desl.motivo}, ${desl.klm}
           )
         `;

@@ -255,11 +255,6 @@
         
         <form id="relatorioForm">
             <div class="form-group">
-                <label>Data <span>*</span></label>
-                <input type="date" id="data" required>
-            </div>
-            
-            <div class="form-group">
                 <label>Nome <span>*</span></label>
                 <select id="nome" required>
                     <option value="">Selecione o colaborador</option>
@@ -367,6 +362,11 @@
                 </div>
                 
                 <div class="form-group">
+                    <label>Data <span>*</span></label>
+                    <input type="date" name="data_${deslocacaoCount}" required>
+                </div>
+                
+                <div class="form-group">
                     <label>Localidade <span>*</span></label>
                     <input type="text" name="localidade_${deslocacaoCount}" required>
                 </div>
@@ -437,6 +437,7 @@
                 items.forEach((item, index) => {
                     const num = index + 1;
                     deslocacoes.push({
+                        data: document.querySelector(`[name="data_${num}"]`).value,
                         localidade: document.querySelector(`[name="localidade_${num}"]`).value,
                         motivo: document.querySelector(`[name="motivo_${num}"]`).value,
                         klm: parseFloat(document.querySelector(`[name="klm_${num}"]`).value)
@@ -444,7 +445,6 @@
                 });
                 
                 const data = {
-                    data: document.getElementById('data').value,
                     colaborador_codigo: nomeData.codigo,
                     colaborador_nome: nomeData.nome,
                     loja: nomeData.loja,

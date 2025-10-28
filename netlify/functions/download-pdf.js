@@ -82,27 +82,17 @@ async function generatePDF(relatorio) {
       
       const dataY = despesasY + 30;
       
-      // Parse da data
-      const dataStr = relatorio.data instanceof Date ? relatorio.data.toISOString().split('T')[0] : relatorio.data;
-      const [year, month, day] = dataStr.split('-');
-      const dataFormatada = `${day}/${month}/${year}`;
-      const diaTabela = dataStr; // Usar data completa YYYY-MM-DD
-      
       doc.fontSize(10).font('Helvetica');
-      doc.text('Data', 50, dataY);
+      doc.text('Matrícula:', 50, dataY);
       doc.rect(150, dataY - 5, 200, 20).stroke();
-      doc.text(dataFormatada, 155, dataY, { width: 190 });
+      doc.text(relatorio.matricula, 155, dataY, { width: 190 });
       
-      doc.text('Matrícula:', 50, dataY + 35);
-      doc.rect(150, dataY + 30, 200, 20).stroke();
-      doc.text(relatorio.matricula, 155, dataY + 35, { width: 190 });
-      
-      doc.text('Proprietário:', 50, dataY + 70);
-      doc.rect(150, dataY + 65, 400, 20).stroke();
-      doc.text(relatorio.colaborador_nome, 155, dataY + 70, { width: 390 });
+      doc.text('Proprietário:', 50, dataY + 35);
+      doc.rect(150, dataY + 30, 400, 20).stroke();
+      doc.text(relatorio.colaborador_nome, 155, dataY + 35, { width: 390 });
       
       // TABELA
-      const tableY = dataY + 110;
+      const tableY = dataY + 75;
       const colWidths = [60, 60, 60, 60, 120, 130];
       const colX = [50, 110, 170, 230, 290, 410];
       const rowHeight = 30;
@@ -126,8 +116,12 @@ async function generatePDF(relatorio) {
       let currentRowY = tableY + rowHeight;
       
       deslocacoes.forEach((desl) => {
+        const dataStr = desl.data instanceof Date ? desl.data.toISOString().split('T')[0] : desl.data;
+        const [year, month, day] = dataStr.split('-');
+        const diaFormatado = `${day}/${month}/${year}`;
+        
         const dataRow = [
-          diaTabela,
+          diaFormatado,
           '09H00',
           '18H00',
           desl.klm.toString(),
