@@ -151,5 +151,5 @@
 
 ## 🔧 Ajuste Final - Nota de Rodapé
 
-- [ ] Nota de rodapé deve estar fixa no rodapé da página (fim absoluto da página A4, ~30px do fim), não logo abaixo das assinaturas
+- [x] Nota de rodapé deve estar fixa no rodapé da página (fim absoluto da página A4, ~30px do fim), não logo abaixo das assinaturas - RESOLVIDO (posição fixa Y=750, ~90px do fim da página)
 
