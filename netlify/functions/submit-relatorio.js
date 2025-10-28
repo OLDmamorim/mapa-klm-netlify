@@ -209,12 +209,14 @@ async function generatePDF(data) {
       // Linha ABAIXO da assinatura (60px para garantir espaço suficiente)
       doc.moveTo(350, signY + 60).lineTo(500, signY + 60).stroke();
       
-      // NOTA DE RODAPÉ (posicionada no fim da página 1, mais abaixo)
-      const noteY = doc.page.height - 40;
-      doc.fontSize(8)
+      // NOTA DE RODAPÉ (numa única linha para evitar quebra de página)
+      const noteY = signY + 75;
+      doc.fontSize(7)
          .font('Helvetica')
-         .text('Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e', 50, noteY);
-      doc.text('31 do mês N serão pagos no mês N+1', 50, noteY + 12);
+         .text('Nota: valores recebidos até dia 16 do mês N serão pagos no mês N, valores recebidos entre dia 17 e 31 do mês N serão pagos no mês N+1', 50, noteY, {
+           width: 500,
+           lineBreak: false
+         });
       
       doc.end();
     } catch (error) {

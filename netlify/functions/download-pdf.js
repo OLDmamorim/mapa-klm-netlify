@@ -183,12 +183,14 @@ async function generatePDF(relatorio) {
       // Linha ABAIXO da assinatura (60px para garantir espaço suficiente)
       doc.moveTo(350, assY + 60).lineTo(490, assY + 60).stroke();
       
-      // Nota de rodapé - MESMA SOLUÇÃO QUE submit-relatorio.js (FUNCIONA!)
-      const noteY = doc.page.height - 40;
-      doc.fontSize(8)
+      // Nota de rodapé (numa única linha para evitar quebra de página)
+      const noteY = assY + 75;
+      doc.fontSize(7)
          .font('Helvetica')
-         .text('Nota: valores recebidos até dia 16 do mês N, serão pagos no mês N, valores recebidos entre dia 17 e', 50, noteY);
-      doc.text('31 do mês N serão pagos no mês N+1', 50, noteY + 12);    
+         .text('Nota: valores recebidos até dia 16 do mês N serão pagos no mês N, valores recebidos entre dia 17 e 31 do mês N serão pagos no mês N+1', 50, noteY, {
+           width: 500,
+           lineBreak: false
+         });    
       doc.end();
     } catch (error) {
       reject(error);
