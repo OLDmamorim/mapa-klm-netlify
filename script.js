@@ -878,6 +878,9 @@ function buildDaySummary(dayDate, isMobile) {
   items = items.filter(a => !!a.locality);
   if (items.length === 0) return '';
 
+  console.log(`📊 buildDaySummary ${iso}: ${items.length} items com localidade`);
+  items.forEach(a => console.log(`  → ${a.plate} service=${a.service} vt=${a.vehicleType||a.vehicle_type||'?'} calib=${a.calibration} time=${getServiceTime(a.service, a.vehicleType||a.vehicle_type, a.calibration)}`));
+
   // KM total
   let totalKm = 0;
   let hasKm = false;
