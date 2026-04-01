@@ -5,24 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - MAPA KLM</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
+        .container { max-width: 1200px; margin: 0 auto; }
         .header {
             background: white;
             padding: 20px;
@@ -32,7 +22,6 @@
             justify-content: space-between;
             align-items: center;
         }
-        
         .back-btn, .logout-btn {
             background: #667eea;
             color: white;
@@ -43,13 +32,7 @@
             font-weight: 600;
             margin-left: 10px;
         }
-        
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab {
             background: rgba(255, 255, 255, 0.2);
             color: white;
@@ -60,86 +43,28 @@
             font-weight: 600;
             transition: all 0.3s;
         }
-        
-        .tab.active {
-            background: white;
-            color: #667eea;
-        }
-        
-        .content {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        th {
-            background: #f7fafc;
-            font-weight: 600;
-            color: #2d3748;
-        }
-        
-        .btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 5px;
-        }
-        
-        .btn-edit {
-            background: #4299e1;
-            color: white;
-        }
-        
-        .btn-delete {
-            background: #f56565;
-            color: white;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #718096;
-        }
-        
+        .tab.active { background: white; color: #667eea; }
+        .content { background: white; padding: 30px; border-radius: 12px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; font-weight: 600; color: #2d3748; }
+        .btn { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 5px; }
+        .btn-edit { background: #4299e1; color: white; }
+        .btn-delete { background: #f56565; color: white; }
+        .loading { text-align: center; padding: 40px; color: #718096; }
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
-        
-        .modal.active {
-            display: flex;
-        }
-        
+        .modal.active { display: flex; }
         .modal-content {
             background: white;
             padding: 30px;
@@ -149,45 +74,30 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-        
-        .form-group input {
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #2d3748; }
+        .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             font-size: 14px;
         }
-        
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .badge {
+            display: inline-block;
+            background: #ebf4ff;
+            color: #3182ce;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 13px;
         }
-        
-        .modal-buttons button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
+        .empty-state { text-align: center; padding: 40px; color: #a0aec0; }
     </style>
 </head>
 <body>
     <script>
-        // Verificar login ANTES de carregar a página
         if (!sessionStorage.getItem('admin_logged_in')) {
             window.location.href = '/login.html';
         }
@@ -200,19 +110,21 @@
                 <button class="logout-btn" onclick="logout()">Sair</button>
             </div>
         </div>
-        
+
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('colaboradores')">Colaboradores</button>
-            <button class="tab" onclick="switchTab('relatorios')">Relatórios</button>
+            <button class="tab active" onclick="switchTab('colaboradores', this)">Colaboradores</button>
+            <button class="tab" onclick="switchTab('lojas', this)">Lojas</button>
+            <button class="tab" onclick="switchTab('relatorios', this)">Relatórios</button>
         </div>
-        
+
         <div class="content">
+            <!-- TAB COLABORADORES -->
             <div id="colaboradores" class="tab-content active">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2>Gestão de Colaboradores</h2>
-                    <button class="btn" style="background: #48bb78; color: white; padding: 10px 20px;" onclick="openAddModal()">+ Adicionar Colaborador</button>
+                    <button class="btn" style="background: #48bb78; color: white; padding: 10px 20px;" onclick="openAddColaboradorModal()">+ Adicionar Colaborador</button>
                 </div>
-                <div class="loading">A carregar...</div>
+                <div id="colaboradoresLoading" class="loading">A carregar...</div>
                 <table id="colaboradoresTable" style="display:none;">
                     <thead>
                         <tr>
@@ -227,10 +139,30 @@
                     <tbody id="colaboradoresBody"></tbody>
                 </table>
             </div>
-            
+
+            <!-- TAB LOJAS -->
+            <div id="lojas" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Gestão de Lojas</h2>
+                    <button class="btn" style="background: #48bb78; color: white; padding: 10px 20px;" onclick="openAddLojaModal()">+ Adicionar Loja</button>
+                </div>
+                <div id="lojasLoading" class="loading">A carregar...</div>
+                <table id="lojasTable" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Colaboradores</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lojasBody"></tbody>
+                </table>
+            </div>
+
+            <!-- TAB RELATÓRIOS -->
             <div id="relatorios" class="tab-content">
                 <h2>Relatórios Submetidos</h2>
-                <div class="loading">A carregar...</div>
+                <div id="relatoriosLoading" class="loading">A carregar...</div>
                 <table id="relatoriosTable" style="display:none;">
                     <thead>
                         <tr>
@@ -247,79 +179,184 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Adicionar Colaborador -->
-    <div id="addModal" class="modal">
+    <div id="addColaboradorModal" class="modal">
         <div class="modal-content">
-            <h2>Adicionar Colaborador</h2>
-            <form id="addForm">
-                <div class="form-group">
-                    <label>Código *</label>
-                    <input type="text" name="codigo" required>
-                </div>
-                <div class="form-group">
-                    <label>Nome *</label>
-                    <input type="text" name="nome" required>
-                </div>
-                <div class="form-group">
-                    <label>Loja *</label>
-                    <select name="loja" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px;">
-                        <option value="">Selecione a loja</option>
-                        <option value="BARCELOS">BARCELOS</option>
-                        <option value="BRAGA - MINHO CENTER">BRAGA - MINHO CENTER</option>
-                        <option value="CALIBRAGENS BRAGA">CALIBRAGENS BRAGA</option>
-                        <option value="FAMALICÃO">FAMALICÃO</option>
-                        <option value="FAMALICÃO SM">FAMALICÃO SM</option>
-                        <option value="GUIMARÃES SHOPPING">GUIMARÃES SHOPPING</option>
-                        <option value="MYCARCENTER">MYCARCENTER</option>
-                        <option value="PAÇOS DE FERREIRA">PAÇOS DE FERREIRA</option>
-                        <option value="PAREDES">PAREDES</option>
-                        <option value="PAREDES SM">PAREDES SM</option>
-                        <option value="PÓVOA DE VARZIM">PÓVOA DE VARZIM</option>
-                        <option value="SERVIÇO MOVEL PESADOS">SERVIÇO MOVEL PESADOS</option>
-                        <option value="VIANA DO CASTELO">VIANA DO CASTELO</option>
-                        <option value="VIANA DO CASTELO SM">VIANA DO CASTELO SM</option>
-                        <option value="VILA VERDE">VILA VERDE</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Função *</label>
-                    <input type="text" name="funcao" required>
-                </div>
-                <div class="form-group">
-                    <label>Empresa *</label>
-                    <input type="text" name="empresa" required>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" style="background: #e2e8f0; color: #2d3748;" onclick="closeAddModal()">Cancelar</button>
-                    <button type="button" style="background: #48bb78; color: white;" onclick="saveColaborador()">Guardar</button>
-                </div>
-            </form>
+            <h2 style="margin-bottom: 20px;">Adicionar Colaborador</h2>
+            <div class="form-group">
+                <label>Código *</label>
+                <input type="text" id="col_codigo">
+            </div>
+            <div class="form-group">
+                <label>Nome *</label>
+                <input type="text" id="col_nome">
+            </div>
+            <div class="form-group">
+                <label>Loja *</label>
+                <select id="col_loja">
+                    <option value="">A carregar lojas...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Função *</label>
+                <input type="text" id="col_funcao">
+            </div>
+            <div class="form-group">
+                <label>Empresa *</label>
+                <input type="text" id="col_empresa">
+            </div>
+            <div class="modal-buttons">
+                <button style="background: #e2e8f0; color: #2d3748;" onclick="closeAddColaboradorModal()">Cancelar</button>
+                <button style="background: #48bb78; color: white;" onclick="saveColaborador()">Guardar</button>
+            </div>
         </div>
     </div>
-    
+
+    <!-- Modal Adicionar Loja -->
+    <div id="addLojaModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Adicionar Loja</h2>
+            <div class="form-group">
+                <label>Nome da Loja *</label>
+                <input type="text" id="loja_nome" placeholder="Ex: PORTO CENTRO" style="text-transform: uppercase;">
+            </div>
+            <div class="modal-buttons">
+                <button style="background: #e2e8f0; color: #2d3748;" onclick="closeAddLojaModal()">Cancelar</button>
+                <button style="background: #48bb78; color: white;" onclick="saveLoja()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let lojasCache = [];
+
         function logout() {
             sessionStorage.removeItem('admin_logged_in');
             window.location.href = '/login.html';
         }
-        
-        function switchTab(tabName) {
+
+        function switchTab(tabName, el) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            event.target.classList.add('active');
+            el.classList.add('active');
             document.getElementById(tabName).classList.add('active');
-            
             if (tabName === 'colaboradores') loadColaboradores();
+            if (tabName === 'lojas') loadLojas();
             if (tabName === 'relatorios') loadRelatorios();
         }
-        
-        async function loadColaboradores() {
+
+        // ── LOJAS ──────────────────────────────────────────────
+
+        async function loadLojas() {
+            document.getElementById('lojasLoading').style.display = 'block';
+            document.getElementById('lojasTable').style.display = 'none';
             try {
-                const response = await fetch('/.netlify/functions/get-colaboradores');
-                const data = await response.json();
-                
+                const res = await fetch('/.netlify/functions/get-lojas');
+                const lojas = await res.json();
+                lojasCache = lojas;
+
+                // Contar colaboradores por loja
+                const resCol = await fetch('/.netlify/functions/get-colaboradores');
+                const colaboradores = await resCol.json();
+                const contagem = {};
+                colaboradores.forEach(c => { contagem[c.loja] = (contagem[c.loja] || 0) + 1; });
+
+                const tbody = document.getElementById('lojasBody');
+                if (lojas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Nenhuma loja registada. Clique em "+ Adicionar Loja".</td></tr>';
+                } else {
+                    tbody.innerHTML = lojas.map(l => `
+                        <tr>
+                            <td><strong>${l.nome}</strong></td>
+                            <td><span class="badge">${contagem[l.nome] || 0} colaborador(es)</span></td>
+                            <td>
+                                <button class="btn btn-delete" onclick="deleteLoja(${l.id}, '${l.nome.replace(/'/g, "\\'")}', ${contagem[l.nome] || 0})">Eliminar</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                document.getElementById('lojasLoading').style.display = 'none';
+                document.getElementById('lojasTable').style.display = 'table';
+
+                // Atualizar select do modal de colaborador
+                populateLojaSelect();
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('lojasLoading').textContent = 'Erro ao carregar lojas.';
+            }
+        }
+
+        function populateLojaSelect() {
+            const select = document.getElementById('col_loja');
+            select.innerHTML = '<option value="">Selecione a loja</option>' +
+                lojasCache.map(l => `<option value="${l.nome}">${l.nome}</option>`).join('');
+        }
+
+        function openAddLojaModal() {
+            document.getElementById('loja_nome').value = '';
+            document.getElementById('addLojaModal').classList.add('active');
+            document.getElementById('loja_nome').focus();
+        }
+
+        function closeAddLojaModal() {
+            document.getElementById('addLojaModal').classList.remove('active');
+        }
+
+        async function saveLoja() {
+            const nome = document.getElementById('loja_nome').value.trim().toUpperCase();
+            if (!nome) { alert('Introduza o nome da loja.'); return; }
+
+            try {
+                const res = await fetch('/.netlify/functions/add-loja', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeAddLojaModal();
+                    loadLojas();
+                } else {
+                    alert(data.error || 'Erro ao adicionar loja');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar loja');
+            }
+        }
+
+        async function deleteLoja(id, nome, numColaboradores) {
+            if (numColaboradores > 0) {
+                alert(`Não é possível eliminar "${nome}".\nExistem ${numColaboradores} colaborador(es) associado(s) a esta loja.`);
+                return;
+            }
+            if (!confirm(`Eliminar a loja "${nome}"?`)) return;
+
+            try {
+                const res = await fetch(`/.netlify/functions/delete-loja?id=${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    loadLojas();
+                } else {
+                    alert(data.error || 'Erro ao eliminar loja');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao eliminar loja');
+            }
+        }
+
+        // ── COLABORADORES ─────────────────────────────────────
+
+        async function loadColaboradores() {
+            document.getElementById('colaboradoresLoading').style.display = 'block';
+            document.getElementById('colaboradoresTable').style.display = 'none';
+            try {
+                const res = await fetch('/.netlify/functions/get-colaboradores');
+                const data = await res.json();
+
                 const tbody = document.getElementById('colaboradoresBody');
                 tbody.innerHTML = data.map(c => `
                     <tr>
@@ -329,24 +366,85 @@
                         <td>${c.funcao}</td>
                         <td>${c.empresa}</td>
                         <td>
-                            <button class="btn btn-edit">Editar</button>
-                            <button class="btn btn-delete">Eliminar</button>
+                            <button class="btn btn-delete" onclick="deleteColaborador('${c.codigo}', '${c.nome.replace(/'/g, "\\'")}')">Eliminar</button>
                         </td>
                     </tr>
                 `).join('');
-                
-                document.querySelector('#colaboradores .loading').style.display = 'none';
+
+                document.getElementById('colaboradoresLoading').style.display = 'none';
                 document.getElementById('colaboradoresTable').style.display = 'table';
             } catch (error) {
                 console.error('Erro:', error);
             }
         }
-        
-        async function loadRelatorios() {
+
+        async function openAddColaboradorModal() {
+            // Carregar lojas se ainda não estiverem em cache
+            if (lojasCache.length === 0) {
+                try {
+                    const res = await fetch('/.netlify/functions/get-lojas');
+                    lojasCache = await res.json();
+                } catch (e) { console.error(e); }
+            }
+            populateLojaSelect();
+            document.getElementById('col_codigo').value = '';
+            document.getElementById('col_nome').value = '';
+            document.getElementById('col_loja').value = '';
+            document.getElementById('col_funcao').value = '';
+            document.getElementById('col_empresa').value = '';
+            document.getElementById('addColaboradorModal').classList.add('active');
+        }
+
+        function closeAddColaboradorModal() {
+            document.getElementById('addColaboradorModal').classList.remove('active');
+        }
+
+        async function saveColaborador() {
+            const data = {
+                codigo:  document.getElementById('col_codigo').value.trim(),
+                nome:    document.getElementById('col_nome').value.trim(),
+                loja:    document.getElementById('col_loja').value,
+                funcao:  document.getElementById('col_funcao').value.trim(),
+                empresa: document.getElementById('col_empresa').value.trim()
+            };
+            if (!data.codigo || !data.nome || !data.loja || !data.funcao || !data.empresa) {
+                alert('Todos os campos são obrigatórios.');
+                return;
+            }
             try {
-                const response = await fetch('/.netlify/functions/get-relatorios');
-                const data = await response.json();
-                
+                const res = await fetch('/.netlify/functions/add-colaborador', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    closeAddColaboradorModal();
+                    loadColaboradores();
+                } else {
+                    alert(result.error || 'Erro ao adicionar colaborador');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar colaborador');
+            }
+        }
+
+        async function deleteColaborador(codigo, nome) {
+            if (!confirm(`Eliminar o colaborador "${nome}"?`)) return;
+            // Reutiliza a função de delete existente se houver, ou implementa aqui
+            alert('Função de eliminar colaborador não implementada ainda.');
+        }
+
+        // ── RELATÓRIOS ────────────────────────────────────────
+
+        async function loadRelatorios() {
+            document.getElementById('relatoriosLoading').style.display = 'block';
+            document.getElementById('relatoriosTable').style.display = 'none';
+            try {
+                const res = await fetch('/.netlify/functions/get-relatorios');
+                const data = await res.json();
+
                 const tbody = document.getElementById('relatoriosBody');
                 tbody.innerHTML = data.map(r => `
                     <tr>
@@ -361,84 +459,35 @@
                         </td>
                     </tr>
                 `).join('');
-                
-                document.querySelector('#relatorios .loading').style.display = 'none';
+
+                document.getElementById('relatoriosLoading').style.display = 'none';
                 document.getElementById('relatoriosTable').style.display = 'table';
             } catch (error) {
                 console.error('Erro:', error);
             }
         }
-        
+
         function downloadPDF(relatorioId) {
             window.open(`/.netlify/functions/download-pdf?id=${relatorioId}`, '_blank');
         }
-        
-        function openAddModal() {
-            document.getElementById('addModal').classList.add('active');
-        }
-        
-        function closeAddModal() {
-            document.getElementById('addModal').classList.remove('active');
-            document.getElementById('addForm').reset();
-        }
-        
-        async function saveColaborador() {
-            const form = document.getElementById('addForm');
-            const formData = new FormData(form);
-            const data = {
-                codigo: formData.get('codigo'),
-                nome: formData.get('nome'),
-                loja: formData.get('loja'),
-                funcao: formData.get('funcao'),
-                empresa: formData.get('empresa')
-            };
-            
-            try {
-                const response = await fetch('/.netlify/functions/add-colaborador', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                if (response.ok) {
-                    alert('Colaborador adicionado com sucesso!');
-                    closeAddModal();
-                    loadColaboradores();
-                } else {
-                    alert('Erro ao adicionar colaborador');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao adicionar colaborador');
-            }
-        }
-        
+
         async function deleteRelatorio(relatorioId) {
-            if (!confirm('Tem a certeza que deseja eliminar este relatório?')) {
-                return;
-            }
-            
+            if (!confirm('Tem a certeza que deseja eliminar este relatório?')) return;
             try {
-                const response = await fetch(`/.netlify/functions/delete-relatorio?id=${relatorioId}`, {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    alert('Relatório eliminado com sucesso!');
+                const res = await fetch(`/.netlify/functions/delete-relatorio?id=${relatorioId}`, { method: 'DELETE' });
+                if (res.ok) {
                     loadRelatorios();
                 } else {
-                    const error = await response.json();
+                    const error = await res.json();
                     alert('Erro ao eliminar relatório: ' + (error.error || 'Erro desconhecido'));
                 }
             } catch (error) {
-                console.error('Erro:', error);
                 alert('Erro ao eliminar relatório');
             }
         }
-        
-        // Carregar colaboradores ao iniciar
+
+        // Iniciar
         loadColaboradores();
     </script>
 </body>
 </html>
-
