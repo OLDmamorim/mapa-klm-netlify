@@ -861,7 +861,6 @@ function getServiceTime(serviceCode, vehicleType, calibration) {
   const key = code + '_' + vt;
   const base = SERVICE_TIMES[key] || SERVICE_TIMES[code + '_L'] || SERVICE_TIMES['PB_L'] || 90;
   const extra = calibration ? (SERVICE_TIMES['CALIB_EXTRA_' + vt] || SERVICE_TIMES['CALIB_EXTRA_L'] || 30) : 0;
-  console.log(`⏱️ getServiceTime: code=${code} vt=${vt} base=${base} calib=${calibration} extra=${extra} total=${base+extra} | SERVICE_TIMES.PB_L=${SERVICE_TIMES.PB_L}`);
   return base + extra;
 }
 
@@ -877,9 +876,6 @@ function buildDaySummary(dayDate, isMobile) {
   // Pré-agendamentos sem localidade não entram no cálculo de tempo/km
   items = items.filter(a => !!a.locality);
   if (items.length === 0) return '';
-
-  console.log(`📊 buildDaySummary ${iso}: ${items.length} items com localidade`);
-  items.forEach(a => console.log(`  → ${a.plate} service=${a.service} vt=${a.vehicleType||a.vehicle_type||'?'} calib=${a.calibration} time=${getServiceTime(a.service, a.vehicleType||a.vehicle_type, a.calibration)}`));
 
   // KM total
   let totalKm = 0;
@@ -1162,6 +1158,8 @@ async function load(){
       if (a.date) {
         a.date = String(a.date).slice(0, 10); // fica só "YYYY-MM-DD"
       }
+      // Normalizar created_at → createdAt
+      if (!a.createdAt && a.created_at) a.createdAt = a.created_at;
     });
 
     // IDs e ordem estáveis
@@ -2131,7 +2129,8 @@ window.reloadAppointments = async function() {
       date: a.date ? String(a.date).slice(0,10) : null,
       address: a.address || a.morada || a.addr || null,
       sortIndex: a.sortIndex || 1,
-      id: a.id ?? (Date.now() + Math.random())
+      id: a.id ?? (Date.now() + Math.random()),
+      createdAt: a.createdAt || a.created_at || null
     }));
     renderAll();
   } catch(e) { console.error('Erro ao recarregar:', e); }
