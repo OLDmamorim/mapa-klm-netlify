@@ -1668,10 +1668,11 @@ function buildDesktopCard(a){
   const sub = loja
     ? [a.notes].filter(Boolean).join(' | ')
     : [a.locality, a.notes].filter(Boolean).join(' | ');
-  // SM com data mas sem localidade → piscar (só coord/admin)
+  // SM com data mas sem localidade → piscar (só coord/admin) — mas não para pré-agendamentos (têm o seu próprio sistema)
   const userRole = window.authClient?.getUser()?.role;
   const canSeeUnconfirmed = userRole === 'admin' || userRole === 'coordenador';
-  const needsLoc = !loja && a.date && !a.locality && canSeeUnconfirmed ? ' needs-locality' : '';
+  const isPreAgendado = a.confirmed === false;
+  const needsLoc = !loja && a.date && !a.locality && canSeeUnconfirmed && !isPreAgendado ? ' needs-locality' : '';
   const locWarning = needsLoc ? `
       <div class="needs-loc-msg">
         <div>⚠️ Falta localidade</div>
@@ -1684,16 +1685,14 @@ function buildDesktopCard(a){
         <div>Importado direto PHC, mantém?</div>
         <div>Confirma status vidro</div>
       </div>` : '';
-  const preAgendado = a.confirmed === false;
-
   // Para SM: botão confirmar só aparece com localidade preenchida
   // Para Loja: aparece sempre
-  const canConfirm = preAgendado && (loja || !!a.locality);
-  const needsLocMsg = preAgendado && !loja && !a.locality
+  const canConfirm = isPreAgendado && (loja || !!a.locality);
+  const needsLocMsg = isPreAgendado && !loja && !a.locality
     ? `<div style="font-size:11px;font-weight:700;color:#fef3c7;background:rgba(0,0,0,0.3);border-radius:6px;padding:4px 8px;margin-top:6px;">📍 Adicionar localidade e morada para confirmar</div>`
     : '';
 
-  const preAgendadoBadge = preAgendado ? `<span class="pre-agendado-badge">⏳ Aguarda confirmação</span>` : '';
+  const preAgendadoBadge = isPreAgendado ? `<span class="pre-agendado-badge">⏳ Aguarda confirmação</span>` : '';
   const confirmBtn = canConfirm
     ? `<button class="dc-confirm-btn" data-confirm="${a.id}">✅ Confirmar agendamento</button>`
     : needsLocMsg;
@@ -1707,7 +1706,7 @@ function buildDesktopCard(a){
     </div>` : '';
 
   return `
-    <div class="appointment desk-card${needsLoc}${preAgendado ? ' pre-agendado' : ''}" data-id="${a.id}" draggable="true"
+    <div class="appointment desk-card${needsLoc}${isPreAgendado ? ' pre-agendado' : ''}" data-id="${a.id}" draggable="true"
          data-locality="${a.locality||''}" data-loccolor="${base}"
          style="--c1:${g.c1}; --c2:${g.c2}; --tc:${textColor}; ${bar}">
       <div class="dc-title"><span class="dc-title-text">${plate}</span></div>
