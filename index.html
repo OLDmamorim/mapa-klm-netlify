@@ -1,0 +1,1204 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <title>Portal de Agendamento - Expressglass</title>
+  <!-- 🚨 TESTE DEPLOY 25/09/2025 13:20 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Agendamentos EG">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    }
+  </script>
+
+  <!-- >>>>>> APENAS PRINT (não afeta ecrã) <<<<<< -->
+  <style>
+    /* Secções de impressão começam ocultas no ecrã */
+    .print-unscheduled-section,
+    .print-today-section,
+    .print-tomorrow-section { display: none; }
+
+    /* Tabelas de impressão (base) */
+    .print-unscheduled-table,
+    .print-today-table,
+    .print-tomorrow-table { width: 100%; border-collapse: collapse; }
+    .print-unscheduled-table th, .print-unscheduled-table td,
+    .print-today-table th,        .print-today-table td,
+    .print-tomorrow-table th,     .print-tomorrow-table td {
+      border: 1px solid #111; padding: 4px 6px; font-size: 12px; vertical-align: top;
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      .print-unscheduled-section,
+      .print-today-section,
+      .print-tomorrow-section { display: block; }
+
+      .print-break-before { break-before: page; page-break-before: always; }
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
+      tr, th, td { break-inside: avoid; page-break-inside: avoid; }
+
+      .print-today-table,
+      .print-tomorrow-table{
+        width:100% !important; border-collapse:collapse !important; table-layout:fixed !important;
+      }
+
+      .print-today-table th:nth-child(1),    .print-today-table td:nth-child(1),
+      .print-tomorrow-table th:nth-child(1), .print-tomorrow-table td:nth-child(1){ width: 8%; }  /* Período */
+      .print-today-table th:nth-child(2),    .print-today-table td:nth-child(2),
+      .print-tomorrow-table th:nth-child(2), .print-tomorrow-table td:nth-child(2){ width:12%; }  /* Matrícula */
+      .print-today-table th:nth-child(3),    .print-today-table td:nth-child(3),
+      .print-tomorrow-table th:nth-child(3), .print-tomorrow-table td:nth-child(3){ width:16%; }  /* Carro */
+      .print-today-table th:nth-child(4),    .print-today-table td:nth-child(4),
+      .print-tomorrow-table th:nth-child(4), .print-tomorrow-table td:nth-child(4){ width:10%; }  /* Serviço */
+      .print-today-table th:nth-child(5),    .print-today-table td:nth-child(5),
+      .print-tomorrow-table th:nth-child(5), .print-tomorrow-table td:nth-child(5){ width:14%; }  /* Localidade */
+      .print-today-table th:nth-child(6),    .print-today-table td:nth-child(6),
+      .print-tomorrow-table th:nth-child(6), .print-tomorrow-table td:nth-child(6){ width: 8%; }  /* Estado */
+      .print-today-table th:nth-child(7),    .print-today-table td:nth-child(7),
+      .print-tomorrow-table th:nth-child(7), .print-tomorrow-table td:nth-child(7){ width:24%; }  /* Observações */
+      .print-today-table th:nth-child(8),    .print-tomorrow-table td:nth-child(8),
+      .print-tomorrow-table td:nth-child(8){ width:8%; }   /* Outros */
+
+      .print-today-table th, .print-tomorrow-table th,
+      .print-tomorrow-table td, .print-today-table td{
+        border:1px solid #000 !important; padding:4px 6px !important; font-size:12px !important;
+        vertical-align:top !important; white-space:normal !important;
+      }
+
+      .print-today-table thead, .print-tomorrow-table thead{ display: table-header-group !important; }
+    }
+
+    /* ===== ECRÃ (NÃO PRINT): Ajustes de colunas na tabela principal ===== */
+    .services-table { table-layout: fixed; width: 100%; }
+    .services-table th, .services-table td{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* Data */        .services-table th:nth-child(1), .services-table td:nth-child(1){ width: 8%; }
+    /* Período */     .services-table th:nth-child(2), .services-table td:nth-child(2){ width: 9%; }
+    /* Matrícula */   .services-table th:nth-child(3), .services-table td:nth-child(3){ width: 10%; }
+    /* Carro */       .services-table th:nth-child(4), .services-table td:nth-child(4){ width: 16%; }
+    /* Serviço */     .services-table th:nth-child(5), .services-table td:nth-child(5){ width: 10%; }
+    /* Localidade */  .services-table th:nth-child(6), .services-table td:nth-child(6){ width: 13%; }
+    /* Observações */ .services-table th:nth-child(7), .services-table td:nth-child(7){ width: 24%; }
+    /* Estado */      .services-table th:nth-child(8), .services-table td:nth-child(8){ width: 8%; }
+    /* Dias */        .services-table th:nth-child(9), .services-table td:nth-child(9){ width: 6%; }
+    .table-wrapper{ overflow-x:auto; }
+    @media (max-width:1100px){ .services-table{ min-width:1100px; } }
+
+    /* ===== MOBILE CARDS — substituído por style.css redesign ===== */
+  </style>
+  <!-- /PRINT -->
+  <script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvVgXxjF7NkHsvm9z-O_6ApJ1kKBM0G6U&libraries=places&v=weekly&loading=async"
+  async defer></script>
+
+</head>
+<body class="page-sm-braga">
+  <div class="page">
+    <header class="page-header">
+      <h1>AGENDAMENTO SM BRAGA</h1>
+      <p class="subtitle">Agendamento serviços Expressglass</p>
+      <div class="header-actions">
+        <div id="connectionStatus" class="connection-status" title="Status da conexão">
+          <span id="statusIcon">🌐</span>
+          <span id="statusText">Online</span>
+        </div>
+        <button id="glassAlertBtn" class="header-btn" title="Vidros a Encomendar" onclick="openGlassAlertModal()">⚠️</button>
+        <button id="backupBtn" class="header-btn" title="Backup de dados">💾</button>
+        <button id="statsBtn" class="header-btn" title="Estatísticas">📊</button>
+        <button id="searchBtn" class="header-btn" title="Pesquisar">🔍</button>
+      </div>
+    </header>
+
+    <!-- Barra de pesquisa -->
+    <div id="searchBar" class="search-bar hidden">
+      <input type="text" id="searchInput" placeholder="Pesquisar por matrícula, carro ou localidade..." />
+      <button id="clearSearch" class="search-clear">✕</button>
+    </div>
+
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button id="prevWeek" class="nav-button">&lt; Anterior</button>
+        <button id="nextWeek" class="nav-button">Próxima &gt;</button>
+        <button id="todayWeek" class="nav-button">📅 Hoje</button>
+      </div>
+      <div class="week-range" id="weekRange">—</div>
+      <div class="nav-right">
+        <button id="calculateRoutes" class="nav-button" title="Otimizar rotas por proximidade">🗺️ Calcular Rotas</button>
+        <button id="btnRelatorioDesk" class="nav-button" title="Relatório semanal">📊 Relatório</button>
+        <button id="printPage" class="nav-button">🖨 Imprimir</button>
+      </div>
+    </div>
+
+    <!-- Calendário (desktop) -->
+    <div class="schedule-container print-page-1">
+      <table id="schedule" class="schedule"></table>
+    </div>
+
+    <!-- Serviços por agendar (desktop) -->
+    <section class="unscheduled-container">
+      <div class="unscheduled-header">
+        <h3>SERVIÇOS POR AGENDAR <span id="unscheduledCount" class="count-badge">0</span></h3>
+        <div class="search-container">
+          <input type="text" id="searchPlate" class="search-input" placeholder="Procurar matrícula (XX-XX-XX)" maxlength="8">
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+      <div class="unscheduled-actions">
+        <button id="addServiceBtn" class="action-btn primary">+ Novo Serviço</button>
+        <button id="importExcelBtn" class="action-btn secondary">📊 Importar Excel</button>
+        <button id="clearAllUnscheduledBtn" class="action-btn danger">🗑️ Limpar Todos</button>
+        <select id="filterStatus" class="filter-select">
+          <option value="">Todos os estados</option>
+          <option value="NE">N/E - Não Executado</option>
+          <option value="VE">V/E - Vidro Encomendado</option>
+          <option value="ST">ST - Serviço Terminado</option>
+        </select>
+      </div>
+      
+      <!-- Vista em tabela -->
+      <div id="unscheduledTable" class="unscheduled-table-container">
+        <table class="unscheduled-table">
+          <thead>
+            <tr>
+              <th>Data Criação</th>
+              <th>Dias Aberto</th>
+              <th>Matrícula</th>
+              <th>Carro</th>
+              <th>Observações</th>
+              <th>Estado</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="unscheduledTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Vista diária (mobile) -->
+    <section id="mobileDayView" class="mobile-day-container">
+      <div class="mobile-day-header">
+        <div class="m-nav-row">
+          <button id="prevDay" class="m-nav-arrow" aria-label="Dia anterior">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <div class="m-date-center">
+            <div id="mobileDayLabel" class="mobile-day-label">—</div>
+            <button id="todayDay" class="m-today-chip">Hoje</button>
+          </div>
+          <button id="nextDay" class="m-nav-arrow" aria-label="Dia seguinte">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+        <button id="btnRelatorio" class="m-report-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Relatório semanal
+        </button>
+      </div>
+      <div id="mobileDayList" class="mobile-day-list"></div>
+      <button id="addServiceMobile" class="mobile-add-btn" aria-label="Novo Serviço">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+    </section>
+
+    <!-- Modal Relatório Semanal -->
+    <div id="relatorioModal" class="modal">
+      <div class="modal-content" style="max-width:520px;">
+        <div class="modal-header">
+          <h3>📊 Relatório Semanal</h3>
+          <button class="close-btn" id="closeRelatorio">✕</button>
+        </div>
+        <div id="relatorioContent" style="padding:20px;"></div>
+      </div>
+    </div>
+
+    <!-- Tabela de serviços a realizar -->
+    <section class="services-table-container print-page-2">
+      <h3 id="servicesTableTitle">SERVIÇOS A REALIZAR</h3>
+      <div class="services-summary">
+        <span id="servicesSummary">Todos os serviços desde hoje em diante</span>
+        <button id="exportServices" class="export-btn">📄 Exportar</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="servicesTable" class="services-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Período</th>
+              <th>Matrícula</th>
+              <th>Carro</th>
+              <th>Serviço</th>
+              <th>Localidade</th>
+              <th>Observações</th>
+              <th>Estado</th>
+              <th>Dias</th>
+              <th class="no-print">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="servicesTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Formulário de agendamento -->
+    <div id="appointmentModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">Novo Agendamento</h3>
+          <button id="closeModal" class="close-btn">✕</button>
+        </div>
+        <form id="appointmentForm" class="appointment-form">
+          <!-- MATRÍCULA EM PRIMEIRO LUGAR -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appointmentPlate">Matrícula *</label>
+              <input
+                type="text"
+                id="appointmentPlate"
+                placeholder="XX-XX-XX"
+                maxlength="8"
+                inputmode="text"
+                autocomplete="off"
+                required
+                pattern="^[A-Za-z0-9]{2}-[A-Za-z0-9]{2}-[A-Za-z0-9]{2}$"
+                title="Use o formato XX-XX-XX (algarismos/letras)"
+              />
+              <small class="form-hint">Formato: XX-XX-XX</small>
+            </div>
+            <div class="form-group">
+              <label for="appointmentCar">Modelo do Carro *</label>
+              <input type="text" id="appointmentCar" placeholder="Ex: BMW X3" required />
+            </div>
+          </div>
+
+          <!-- DATA EM SEGUNDO LUGAR -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appointmentDate">Data</label>
+              <input type="date" id="appointmentDate" autocomplete="off"/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+            <label for="appointmentLocality">Localidade *</label>
+  <input type="hidden" id="appointmentLocality" required>
+  <div class="locality-autocomplete" id="localityAutocomplete">
+    <div class="locality-selected" id="localitySelected" onclick="window.toggleLocalityDropdown()">
+      <span class="dot" id="selectedLocalityDot"></span>
+      <span id="selectedLocalityText">Selecione a localidade</span>
+      <svg width="12" height="12" viewBox="0 0 12 12" style="margin-left:auto;opacity:.5"><path d="M3 5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div id="localityDropdown">
+      <input type="text" id="localitySearch" placeholder="Escreva para filtrar..." autocomplete="off">
+      <div id="localityOptions"></div>
+    </div>
+  </div>
+</div>
+
+
+
+        <div class="form-row">
+  <!-- Tipo de Serviço -->
+  <div class="form-group">
+    <label for="appointmentService">Tipo de Serviço *</label>
+    <select id="appointmentService" required>
+      <option value="">Selecione o tipo de serviço</option>
+      <option value="PB">PB - Para-brisas</option>
+      <option value="LT">LT - Lateral</option>
+      <option value="OC">OC - Óculo</option>
+      <option value="REP">REP - Reparação</option>
+      <option value="POL">POL - Polimento</option>
+    </select>
+  </div>
+
+  <!-- 2ª coluna: Status do Vidro -->
+  <div class="form-group">
+    <label for="appointmentStatus">Status do Vidro *</label>
+    <select id="appointmentStatus" required>
+      <option value="NE">N/E - Não Executado</option>
+      <option value="VE">V/E - Vidro Encomendado</option>
+      <option value="ST">ST - Serviço Terminado</option>
+    </select>
+  </div>
+</div>
+
+<div class="form-row">
+  <!-- Tipo de Veículo -->
+  <div class="form-group">
+    <label for="appointmentVehicleType">Tipo de Veículo</label>
+    <select id="appointmentVehicleType">
+      <option value="L">🚗 Ligeiro</option>
+      <option value="P">🚛 Pesado</option>
+    </select>
+  </div>
+
+  <!-- Calibragem ADAS -->
+  <div class="form-group calib-group">
+    <label>Calibragem</label>
+    <label class="calib-toggle" for="appointmentCalibration">
+      <input type="checkbox" id="appointmentCalibration" />
+      <span class="calib-toggle-ui">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </span>
+      <span class="calib-toggle-label">Requer calibragem ADAS</span>
+    </label>
+  </div>
+</div>
+
+
+          <div class="form-group">
+            <label for="appointmentNotes">Observações</label>
+            <textarea id="appointmentNotes" placeholder="Informações adicionais (não aparece no calendário)" rows="3"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appointmentAddress">Morada (opcional)</label>
+              <input type="text" id="appointmentAddress" placeholder="Rua, nº, localidade..." autocomplete="off" />
+              <small class="form-hint">A distância será calculada automaticamente</small>
+            </div>
+            <div class="form-group">
+              <label for="appointmentKm">Distância (km)</label>
+              <input type="number" id="appointmentKm" placeholder="Calculado automaticamente" readonly style="background-color: #f3f4f6;" />
+              <small class="form-hint">Calculado automaticamente com base na morada</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appointmentPhone">Contacto (opcional)</label>
+              <input type="tel" id="appointmentPhone" placeholder="Ex: 912 345 678" pattern="[0-9+\s]{9,15}" />
+              <small class="form-hint">Aceita dígitos e +</small>
+            </div>
+            <div class="form-group">
+              <label for="appointmentExtra">Outros dados (opcional)</label>
+              <textarea id="appointmentExtra" placeholder="Informações adicionais (não aparece no calendário)" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Selector Pré-agendamento / Confirmado -->
+          <div class="form-group" style="margin-bottom:20px;">
+            <label style="font-weight:700;font-size:13px;color:#374151;margin-bottom:8px;display:block;">Estado do Agendamento *</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <button type="button" id="btnPreAgendado"
+                onclick="setConfirmed(false)"
+                style="padding:14px 10px;border-radius:10px;border:2px solid #f59e0b;background:#fef3c7;color:#92400e;font-weight:800;font-size:14px;cursor:pointer;transition:all .15s;">
+                ⏳ Pré-agendamento
+              </button>
+              <button type="button" id="btnConfirmado"
+                onclick="setConfirmed(true)"
+                style="padding:14px 10px;border-radius:10px;border:2px solid #d1d5db;background:#f9fafb;color:#6b7280;font-weight:800;font-size:14px;cursor:pointer;transition:all .15s;">
+                ✅ Agendamento Confirmado
+              </button>
+            </div>
+            <input type="hidden" id="appointmentConfirmed" value="true">
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="cancelForm" class="btn secondary">Cancelar</button>
+            <button type="button" id="deleteAppointment" class="btn danger hidden">Eliminar</button>
+            <button type="submit" class="btn primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal de estatísticas -->
+    <div id="statsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>📊 Estatísticas</h3>
+          <button class="close-btn" onclick="closeStatsModal()">✕</button>
+        </div>
+        <div id="statsContent" class="stats-content"></div>
+      </div>
+    </div>
+
+    <!-- Modal de progresso de otimização -->
+    <div id="progressModal" class="modal">
+      <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+          <h3>🗺️ Otimizando Rotas</h3>
+        </div>
+        <div class="progress-content" style="padding: 20px;">
+          <div id="progressText" style="margin-bottom: 15px; font-size: 16px; text-align: center;">
+            Analisando serviços...
+          </div>
+          <div class="progress-bar-container" style="background: #e5e7eb; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 15px;">
+            <div id="progressBar" style="background: linear-gradient(90deg, #3b82f6, #1d4ed8); height: 100%; width: 0%; transition: width 0.3s ease; border-radius: 10px;"></div>
+          </div>
+          <div id="progressPercentage" style="text-align: center; font-weight: bold; color: #3b82f6;">
+            0%
+          </div>
+          <div id="progressDetails" style="margin-top: 15px; font-size: 14px; color: #6b7280; text-align: center;">
+            Preparando otimização...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- PRINT: Por agendar -->
+    <div class="print-unscheduled-section">
+      <h2>SERVIÇOS POR AGENDAR</h2>
+      <table class="print-unscheduled-table">
+        <thead>
+          <tr>
+            <th>Matrícula</th>
+            <th>Modelo do Carro</th>
+            <th>Serviço</th>
+            <th>Localidade</th>
+            <th>Estado</th>
+            <th>Observações</th>
+            <th>Outros Dados</th>
+          </tr>
+        </thead>
+        <tbody id="printUnscheduledTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- PRINT HOJE -->
+    <div class="print-today-section print-break-before">
+      <h2 id="printTodayTitle">SERVIÇOS DE HOJE</h2>
+      <div class="print-today-date" id="printTodayDate"></div>
+      <table class="print-today-table">
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Matrícula</th>
+            <th>Modelo do Carro</th>
+            <th>Serviço</th>
+            <th>Localidade</th>
+            <th>Estado</th>
+            <th>Observações</th>
+            <th>Outros Dados</th>
+          </tr>
+        </thead>
+        <tbody id="printTodayTableBody"></tbody>
+      </table>
+      <div class="print-today-empty" id="printTodayEmpty" style="display:none;">
+        <p>Não há serviços agendados para hoje.</p>
+      </div>
+    </div>
+
+    <!-- PRINT: Amanhã -->
+    <div class="print-tomorrow-section print-break-before">
+      <h2 id="printTomorrowTitle">SERVIÇOS DE AMANHÃ</h2>
+      <div class="print-tomorrow-date" id="printTomorrowDate"></div>
+      <table class="print-tomorrow-table">
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Matrícula</th>
+            <th>Modelo do Carro</th>
+            <th>Serviço</th>
+            <th>Localidade</th>
+            <th>Estado</th>
+            <th>Observações</th>
+            <th>Outros Dados</th>
+          </tr>
+        </thead>
+        <tbody id="printTomorrowTableBody"></tbody>
+      </table>
+      <div class="print-tomorrow-empty" id="printTomorrowEmpty" style="display: none;">
+        <p>Não há serviços agendados para amanhã.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts principais -->
+  <script src="auth-client.js"></script>
+
+  <!-- Modal de backup — fora da .page para evitar clipping -->
+  <div id="backupModal" class="modal">
+    <div class="modal-content" style="max-width:480px;">
+      <div class="modal-header">
+        <h3>💾 Backup / Restaurar</h3>
+        <button class="close-btn" id="closeBackupModal">✕</button>
+      </div>
+      <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;">
+          <div style="font-weight:700;font-size:15px;margin-bottom:6px;">📤 Exportar backup</div>
+          <div style="font-size:13px;color:#6b7280;margin-bottom:12px;">Descarrega um ficheiro JSON com todos os agendamentos do portal activo.</div>
+          <button id="btnExportBackup" class="btn primary" style="width:100%;">💾 Descarregar backup agora</button>
+        </div>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:16px;">
+          <div style="font-weight:700;font-size:15px;margin-bottom:6px;">📥 Restaurar backup</div>
+          <div style="font-size:13px;color:#6b7280;margin-bottom:12px;">
+            Repõe os agendamentos a partir de um ficheiro de backup.<br>
+            <strong style="color:#ea580c;">⚠️ Só restaura os que não existem — não apaga os actuais.</strong>
+          </div>
+          <input type="file" id="restoreFile" accept=".json" style="display:none;">
+          <button id="btnChooseRestore" class="btn secondary" style="width:100%;margin-bottom:8px;">📁 Escolher ficheiro de backup</button>
+          <div id="restoreStatus" style="font-size:13px;display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="portal-init.js"></script>
+  <script src="api.js?v=2026-03-31"></script>
+  <script src="script.js?v=2026-04-01"></script>
+  
+  <!-- Biblioteca SheetJS para leitura de Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <!-- Sistema de Importação Excel -->
+  <script src="excel-templates.js"></script>
+  <script src="template-personalizado.js"></script>
+  <script src="template-expressglass-completo.js"></script>
+  <script src="excel-import.js"></script>
+  <script src="excel-import-ui.js"></script>
+  
+  <!-- Sistema de Alerta de Vidros -->
+  <script src="glass-alert.js"></script>
+
+  <!-- >>>>>> SCRIPT DE IMPRESSÃO (garantir preenchimento antes de imprimir) <<<<<< -->
+  <script>
+    function fillPrintSectionsSafely(){
+      try{ if (typeof renderAll === 'function') renderAll(); }catch(e){}
+      try{ if (typeof window.fillPrintFromAppointments === 'function') window.fillPrintFromAppointments(); }catch(e){}
+    }
+    window.onbeforeprint = fillPrintSectionsSafely;
+    document.getElementById('printPage')?.addEventListener('click', ()=>{
+      fillPrintSectionsSafely();
+      setTimeout(()=>window.print(), 20);
+    });
+  </script>
+</body>
+</html>
+
+<!-- MODAL DE SELEÇÃO DE DIA PARA CÁLCULO DE ROTAS -->
+<div id="selectDayModal" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-header">
+      <h3>🗺️ Selecionar Dia para Calcular Rotas</h3>
+      <button class="close-btn" onclick="closeSelectDayModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body" style="padding: 24px;">
+      <p style="margin-bottom: 20px; color: #6b7280;">Selecione o dia para o qual pretende otimizar as rotas:</p>
+      
+      <div class="form-group">
+        <label for="routeCalculationDate" style="display: block; margin-bottom: 8px; font-weight: 600;">Data</label>
+        <input type="date" id="routeCalculationDate" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" />
+      </div>
+      
+      <div style="margin-top: 20px; padding: 12px; background: #fef3c7; border-radius: 6px; font-size: 13px; color: #92400e;">
+        <strong>⚠️ Nota:</strong> Apenas serão otimizados os serviços do dia selecionado que tenham morada preenchida.
+      </div>
+    </div>
+    
+    <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; gap: 12px; justify-content: flex-end;">
+      <button onclick="closeSelectDayModal()" class="action-btn" style="background: #6b7280;">Cancelar</button>
+      <button onclick="confirmCalculateRoutes()" class="action-btn primary" style="background: #3b82f6;">🗺️ Calcular Rotas</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE ALERTA DE VIDROS A ENCOMENDAR -->
+<div id="glassAlertModal" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+    <div class="modal-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+      <h2 style="margin: 0; color: white;">⚠️ Vidros a Encomendar</h2>
+      <button class="close-btn" onclick="closeGlassAlertModal()" style="color: white;">&times;</button>
+    </div>
+    
+    <div class="modal-body" style="padding: 20px; overflow-y: auto; max-height: calc(90vh - 200px);">
+      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px;">
+        <p style="margin: 0; font-size: 14px; color: #92400e;">
+          <strong>📅 Vidros necessários para os próximos 3 dias</strong><br>
+          Marque como "Encomendado" à medida que fizer as encomendas.
+        </p>
+      </div>
+      
+      <div id="glassAlertList" style="margin-top: 20px;">
+        <!-- Lista será preenchida dinamicamente -->
+      </div>
+      
+      <div id="glassAlertEmpty" style="display: none; text-align: center; padding: 40px; color: #6b7280;">
+        <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+        <p style="font-size: 16px; font-weight: 600; margin: 0;">Todos os vidros estão encomendados!</p>
+        <p style="font-size: 14px; margin-top: 8px;">Não há vidros pendentes para os próximos 3 dias.</p>
+      </div>
+    </div>
+    
+    <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 12px; justify-content: space-between; align-items: center;">
+      <div style="font-size: 13px; color: #6b7280;">
+        <span id="glassAlertPendingCount">0</span> vidro(s) pendente(s)
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button onclick="printGlassAlert()" class="action-btn" style="background: #6b7280;">
+          🖨️ Imprimir
+        </button>
+        <button onclick="closeGlassAlertModal()" class="action-btn primary" style="background: #3b82f6;">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SEÇÃO DE IMPRESSÃO DE VIDROS (oculta) -->
+<div id="glassPrintSection" style="display: none;">
+  <style media="print">
+    /* Resetar tudo para garantir isolamento */
+    @page { 
+      margin: 20mm; 
+      size: A4 portrait;
+    }
+    
+    /* Ocultar TUDO exceto glassPrintSection */
+    body > *:not(#glassPrintSection) {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    
+    #glassPrintSection {
+      display: block !important;
+      visibility: visible !important;
+      position: static !important;
+    }
+    
+    body { 
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .glass-print-header { 
+      text-align: center; 
+      margin-bottom: 30px; 
+      page-break-inside: avoid;
+    }
+    
+    .glass-print-header h1 { 
+      margin: 0 0 10px 0; 
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .glass-print-header p { 
+      margin: 5px 0; 
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .glass-print-table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 20px;
+    }
+    
+    .glass-print-table th, 
+    .glass-print-table td { 
+      border: 1px solid #333; 
+      padding: 8px 6px; 
+      text-align: left;
+      font-size: 12px;
+    }
+    
+    .glass-print-table th { 
+      background: #e5e7eb !important; 
+      font-weight: bold;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    .glass-print-table tr:nth-child(even) { 
+      background: #f9fafb !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    .glass-print-checkbox { 
+      width: 18px; 
+      height: 18px; 
+      border: 2px solid #000; 
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+  
+  <div class="glass-print-header">
+    <h1>⚠️ Vidros a Encomendar</h1>
+    <p id="glassPrintDate"></p>
+    <p>Próximos 3 dias</p>
+  </div>
+  
+  <table class="glass-print-table" id="glassPrintTable">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Matrícula</th>
+        <th>Carro</th>
+        <th>Serviço</th>
+        <th>Localidade</th>
+        <th>Observações</th>
+        <th style="width: 80px;">Encomendado</th>
+      </tr>
+    </thead>
+    <tbody id="glassPrintTableBody">
+      <!-- Linhas serão preenchidas dinamicamente -->
+    </tbody>
+  </table>
+</div>
+
+<!-- MODAL DE IMPORTAÇÃO EXCEL -->
+<div id="excelImportModal" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-header">
+      <h2>📊 Importar Serviços do Excel</h2>
+      <button class="close-btn" onclick="closeExcelImportModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- PASSO 1: UPLOAD DO FICHEIRO -->
+      <div id="step1" class="import-step">
+        <h3>1️⃣ Carregar Ficheiro Excel</h3>
+        
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-content">
+            <div class="upload-icon">📁</div>
+            <p><strong>Arraste o ficheiro Excel aqui</strong></p>
+            <p>ou</p>
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('excelFile').click()">
+              Escolher Ficheiro
+            </button>
+            <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;">
+          </div>
+        </div>
+        
+        <div class="template-download">
+          <p>📋 Não tem um ficheiro? <button type="button" class="btn-link" onclick="downloadTemplate()">Descarregar Template</button></p>
+        </div>
+        
+        <div id="fileInfo" style="display: none;">
+          <div class="file-info">
+            <h4>✅ Ficheiro Carregado</h4>
+            <p><strong>Nome:</strong> <span id="fileName"></span></p>
+            <p><strong>Linhas:</strong> <span id="rowCount"></span></p>
+            <p><strong>Colunas:</strong> <span id="columnCount"></span></p>
+          </div>
+          
+          <button type="button" class="btn btn-primary" onclick="goToStep2()">
+            Continuar para Mapeamento →
+          </button>
+        </div>
+      </div>
+      
+      <!-- PASSO 2: MAPEAMENTO DE COLUNAS -->
+      <div id="step2" class="import-step" style="display: none;">
+        <h3>2️⃣ Mapear Colunas</h3>
+        <p>Associe as colunas do Excel aos campos do sistema:</p>
+        
+        <div class="mapping-grid">
+          <div class="mapping-row">
+            <label>Matrícula *</label>
+            <select id="mapPlate" class="mapping-select">
+              <option value="">-- Selecionar Coluna --</option>
+            </select>
+          </div>
+          
+          <div class="mapping-row">
+            <label>Modelo do Carro *</label>
+            <select id="mapCar" class="mapping-select">
+              <option value="">-- Selecionar Coluna --</option>
+            </select>
+          </div>
+          
+          <div class="mapping-row">
+            <label>Tipo de Serviço *</label>
+            <select id="mapService" class="mapping-select">
+              <option value="">-- Selecionar Coluna --</option>
+            </select>
+          </div>
+          
+          <div class="mapping-row">
+            <label>Localidade *</label>
+            <select id="mapLocality" class="mapping-select">
+              <option value="">-- Selecionar Coluna --</option>
+            </select>
+          </div>
+          
+          <div class="mapping-row">
+            <label>Observações</label>
+            <select id="mapNotes" class="mapping-select">
+              <option value="">-- Selecionar Coluna --</option>
+            </select>
+          </div>
+          
+          <div class="mapping-row">
+            <label>Morada</label>
+            <select id="mapAddress" class="mapping-select">
+              <option value="">-- Selecionar Coluna --</option>
+            </select>
+          </div>
+          
+          <div class="mapping-row">
+            <label>Contacto</label>
+            <select id="mapPhone" class="mapping-select">
+              <option value="">-- Selecionar Coluna --</option>
+            </select>
+          </div>
+          
+          <div class="mapping-row">
+            <label>Outros Dados</label>
+            <select id="mapExtra" class="mapping-select">
+              <option value="">-- Selecionar Coluna --</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="step-actions">
+          <button type="button" class="btn btn-secondary" onclick="goToStep1()">
+            ← Voltar
+          </button>
+          <button type="button" class="btn btn-primary" onclick="goToStep3()">
+            Pré-visualizar Dados →
+          </button>
+        </div>
+      </div>
+      
+      <!-- PASSO 3: PRÉ-VISUALIZAÇÃO -->
+      <div id="step3" class="import-step" style="display: none;">
+        <h3>3️⃣ Pré-visualização dos Dados</h3>
+        
+        <div id="validationSummary" class="validation-summary">
+          <div class="summary-stats">
+            <div class="stat-item success">
+              <span class="stat-number" id="validCount">0</span>
+              <span class="stat-label">Válidos</span>
+            </div>
+            <div class="stat-item error">
+              <span class="stat-number" id="errorCount">0</span>
+              <span class="stat-label">Erros</span>
+            </div>
+          </div>
+        </div>
+        
+        <div id="errorsList" style="display: none;">
+          <h4>❌ Erros Encontrados</h4>
+          <div class="errors-container" id="errorsContainer"></div>
+        </div>
+        
+        <div id="previewTable">
+          <h4>✅ Dados Válidos (Primeiros 10)</h4>
+          <div class="table-container">
+            <table class="preview-table">
+              <thead id="previewHeaders"></thead>
+              <tbody id="previewBody"></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="step-actions">
+          <button type="button" class="btn btn-secondary" onclick="goToStep2()">
+            ← Voltar
+          </button>
+          <button type="button" class="btn btn-success" onclick="importData()" id="importBtn">
+            📥 Importar Dados
+          </button>
+        </div>
+      </div>
+      
+      <!-- PASSO 4: RESULTADO DA IMPORTAÇÃO -->
+      <div id="step4" class="import-step" style="display: none;">
+        <h3>4️⃣ Resultado da Importação</h3>
+        
+        <div id="importResults" class="import-results">
+          <div class="result-summary">
+            <div class="result-item success">
+              <span class="result-number" id="successCount">0</span>
+              <span class="result-label">Importados</span>
+            </div>
+            <div class="result-item error">
+              <span class="result-number" id="failCount">0</span>
+              <span class="result-label">Falharam</span>
+            </div>
+          </div>
+          
+          <div id="importDetails" class="import-details"></div>
+        </div>
+        
+        <div class="step-actions">
+          <button type="button" class="btn btn-primary" onclick="finishImport()">
+            ✅ Concluir
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="startNewImport()">
+            🔄 Nova Importação
+          </button>
+        </div>
+      </div>
+      
+      <!-- LOADING -->
+      <div id="loadingStep" class="import-step loading-step" style="display: none;">
+        <div class="loading-content">
+          <div class="spinner"></div>
+          <h3 id="loadingText">Processando...</h3>
+          <p id="loadingSubtext">Por favor aguarde...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ESTILOS DO MODAL DE IMPORTAÇÃO */
+.import-step {
+  padding: 20px 0;
+}
+
+.upload-area {
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 40px;
+  text-align: center;
+  margin: 20px 0;
+  transition: border-color 0.3s;
+}
+
+.upload-area.dragover {
+  border-color: #007bff;
+  background-color: #f8f9fa;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.file-info {
+  background: #e8f5e8;
+  border: 1px solid #28a745;
+  border-radius: 5px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.template-download {
+  text-align: center;
+  margin: 15px 0;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mapping-grid {
+  display: grid;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.mapping-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: center;
+  gap: 15px;
+}
+
+.mapping-row label {
+  font-weight: bold;
+}
+
+.mapping-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.validation-summary {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.summary-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stat-item.success .stat-number {
+  color: #28a745;
+}
+
+.stat-item.error .stat-number {
+  color: #dc3545;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.errors-container {
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.error-item {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: #f8d7da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+}
+
+.preview-table th,
+.preview-table td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.preview-table th {
+  background: #f8f9fa;
+  font-weight: bold;
+}
+
+.table-container {
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.import-results {
+  text-align: center;
+}
+
+.result-summary {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 30px 0;
+}
+
+.result-item {
+  text-align: center;
+}
+
+.result-number {
+  display: block;
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.result-item.success .result-number {
+  color: #28a745;
+}
+
+.result-item.error .result-number {
+  color: #dc3545;
+}
+
+.result-label {
+  font-size: 16px;
+  color: #666;
+}
+
+.import-details {
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: left;
+  margin: 20px 0;
+}
+
+.loading-step {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#loadingText {
+  margin: 0;
+  color: #007bff;
+}
+
+#loadingSubtext {
+  margin: 0;
+  color: #666;
+}
+</style>
