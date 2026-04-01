@@ -450,9 +450,9 @@ table.schedule td.is-today {
 .desk-card .dc-title-text {
   padding: 5px 12px;
   color: #111 !important;
-  font-family: Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 700;
+  font-family: 'Figtree', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
   letter-spacing: 3px;
   text-shadow: none;
 }
@@ -1039,9 +1039,9 @@ table.schedule td.is-today {
   .m-title-text {
     padding: 6px 14px;
     color: #111 !important;
-    font-family: Arial, sans-serif;
-    font-size: 22px;
-    font-weight: 700;
+    font-family: 'Figtree', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
     letter-spacing: 3px;
     text-shadow: none;
   }
