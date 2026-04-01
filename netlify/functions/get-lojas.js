@@ -20,6 +20,17 @@ exports.handler = async (event, context) => {
       )
     `;
 
+    // Se tabela vazia, popular automaticamente a partir dos colaboradores existentes
+    const count = await sql`SELECT COUNT(*) as total FROM lojas`;
+    if (parseInt(count[0].total) === 0) {
+      const lojasExistentes = await sql`
+        SELECT DISTINCT loja FROM colaboradores WHERE loja IS NOT NULL AND loja != '' ORDER BY loja
+      `;
+      for (const row of lojasExistentes) {
+        await sql`INSERT INTO lojas (nome) VALUES (${row.loja}) ON CONFLICT (nome) DO NOTHING`;
+      }
+    }
+
     const lojas = await sql`SELECT * FROM lojas ORDER BY nome`;
     await sql.end();
 
