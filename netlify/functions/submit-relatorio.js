@@ -1,6 +1,6 @@
 const postgres = require('postgres');
 const PDFDocument = require('pdfkit');
-const nodemailer = require('nodemailer');
+const { getEmailConfig, sendEmail } = require('../lib/email');
 const https = require('https');
 const http = require('http');
 
@@ -217,35 +217,6 @@ async function generatePDF(data) {
   });
 }
 
-async function sendEmail(pdfBuffer, data) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT),
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
-  });
-  
-  const totalKM = data.deslocacoes.reduce((sum, d) => sum + parseFloat(d.klm), 0);
-  const totalDespesas = (totalKM * 0.36).toFixed(2);
-  const localidades = data.deslocacoes.map(d => d.localidade).join(', ');
-  
-  const mailOptions = {
-    from: process.env.SMTP_USER,
-    to: process.env.ADMIN_EMAIL || 'mamorim@expressglass.pt',
-    subject: `MAPA KLM - ${data.colaborador_nome}`,
-    text: `Novo relatório de KM submetido por ${data.colaborador_nome}.\n\nDetalhes:\n- Loja: ${data.loja}\n- Matrícula: ${data.matricula}\n- Localidades: ${localidades}\n- Total KM: ${totalKM.toFixed(2)} km\n- Total Despesas: ${totalDespesas} €\n- Número de deslocações: ${data.deslocacoes.length}`,
-    attachments: [{
-      filename: `Relatorio_${data.colaborador_nome.replace(/ /g, '')}_${new Date().toISOString().split('T')[0]}.pdf`,
-      content: pdfBuffer
-    }]
-  };
-  
-  await transporter.sendMail(mailOptions);
-}
-
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -259,6 +230,9 @@ exports.handler = async (event, context) => {
       throw new Error('Pelo menos uma deslocação é necessária');
     }
     
+    // Validar a configuração antes de gerar o PDF.
+    getEmailConfig();
+
     // Gerar PDF
     const pdfBuffer = await generatePDF(data);
     
@@ -299,4 +273,3 @@ exports.handler = async (event, context) => {
     };
   }
 };
-

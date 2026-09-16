@@ -1,5 +1,32 @@
 # Instruções para Deploy Manual no Netlify
 
+## Envio de relatórios pelo noreply do PoweringEG
+
+O envio usa a API HTTPS do Resend, com o mesmo remetente do PoweringEG.
+As variáveis SMTP do Gmail já não são utilizadas pela submissão de relatórios.
+
+Antes de publicar esta versão, configure no projeto `mapaklmeg`, em **Environment variables**:
+
+| Variável | Valor |
+| --- | --- |
+| `RESEND_API_KEY` | Chave privada do Resend autorizada a enviar pelo domínio `poweringeg.pt`. |
+| `EMAIL_FROM` | `PoweringEG Platform <noreply@poweringeg.pt>` (também é o valor por defeito). |
+| `ADMIN_EMAIL` | Destinatário dos relatórios. Por defeito: `mamorim@expressglass.pt`. Aceita vários endereços separados por vírgulas. |
+
+As variáveis devem estar disponíveis no contexto **Production** e no âmbito **Functions**
+(ou em todos os âmbitos). Depois de as configurar, faça um novo deploy para as aplicar.
+Guarde a chave apenas nas variáveis privadas do Netlify; nunca em ficheiros do repositório.
+
+O serviço só considera o envio aceite quando o Resend responde com sucesso e devolve um ID.
+Essa aceitação não confirma a entrega na caixa de correio, que pode ser consultada no Resend.
+Não existe fallback para Gmail. Se a chave faltar, a submissão apresenta uma mensagem de configuração.
+
+Esta alteração substitui apenas o transporte de email. O fluxo existente continua a enviar
+antes de gravar as deslocações; a gravação independente do email e a prevenção de duplicados
+precisam de uma alteração própria.
+
+Validação local, sem enviar emails nem ligar à base de dados: `npm test`.
+
 ## Ficheiros Alterados
 
 Os seguintes ficheiros foram corrigidos para resolver o erro de timezone:
@@ -41,4 +68,3 @@ const dataFormatada = `${day}/${month}/${year}`;
 ```
 
 Isso evita problemas de timezone do JavaScript.
-
