@@ -431,9 +431,21 @@
         }
 
         async function deleteColaborador(codigo, nome) {
-            if (!confirm(`Eliminar o colaborador "${nome}"?`)) return;
-            // Reutiliza a função de delete existente se houver, ou implementa aqui
-            alert('Função de eliminar colaborador não implementada ainda.');
+            if (!confirm(`Eliminar o colaborador "${nome}"?\nOs relatórios já submetidos são mantidos.`)) return;
+
+            try {
+                const res = await fetch(`/.netlify/functions/delete-colaborador?codigo=${encodeURIComponent(codigo)}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    loadColaboradores();
+                    loadLojas();
+                } else {
+                    alert(data.error || 'Erro ao eliminar colaborador');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao eliminar colaborador');
+            }
         }
 
         // ── RELATÓRIOS ────────────────────────────────────────

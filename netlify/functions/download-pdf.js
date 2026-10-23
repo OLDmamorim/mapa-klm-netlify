@@ -213,8 +213,9 @@ exports.handler = async (event) => {
     const sql = postgres(process.env.DATABASE_URL, { ssl: 'prefer' });
     
     // Buscar o relatório principal pelo ID com nome do colaborador
+    // (se o colaborador já não existir, usa o nome guardado no relatório)
     const relatorios = await sql`
-      SELECT r.*, c.nome as colaborador_nome 
+      SELECT r.*, COALESCE(c.nome, r.colaborador_nome) as colaborador_nome
       FROM relatorios r
       LEFT JOIN colaboradores c ON r.colaborador_codigo = c.codigo
       WHERE r.id = ${relatorioId}
@@ -232,7 +233,7 @@ exports.handler = async (event) => {
     
     // Buscar TODAS as deslocações do mesmo relatório (mesma data + colaborador + matrícula)
     const todasDeslocacoes = await sql`
-      SELECT r.*, c.nome as colaborador_nome, c.loja
+      SELECT r.*, COALESCE(c.nome, r.colaborador_nome) as colaborador_nome, c.loja
       FROM relatorios r
       LEFT JOIN colaboradores c ON r.colaborador_codigo = c.codigo
       WHERE r.data = ${relatorio.data}
@@ -259,7 +260,7 @@ exports.handler = async (event) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="Relatorio_KM_${relatorio.colaborador_nome.replace(/ /g, '_')}_${dataFormatada}.pdf"`
+        'Content-Disposition': `attachment; filename="Relatorio_KM_${(relatorio.colaborador_nome || relatorio.colaborador_codigo).replace(/ /g, '_')}_${dataFormatada}.pdf"`
       },
       body: pdfBuffer.toString('base64'),
       isBase64Encoded: true

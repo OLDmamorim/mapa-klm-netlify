@@ -1,4 +1,5 @@
 const postgres = require('postgres');
+const { ensureAtivoColumn } = require('../lib/colaboradores');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'DELETE') {
@@ -36,8 +37,9 @@ exports.handler = async (event, context) => {
       };
     }
 
+    await ensureAtivoColumn(sql);
     const colaboradoresNaLoja = await sql`
-      SELECT COUNT(*) as total FROM colaboradores WHERE loja = ${loja[0].nome}
+      SELECT COUNT(*) as total FROM colaboradores WHERE loja = ${loja[0].nome} AND ativo
     `;
     if (parseInt(colaboradoresNaLoja[0].total) > 0) {
       await sql.end();
