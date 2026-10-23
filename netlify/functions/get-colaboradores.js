@@ -1,4 +1,5 @@
 const postgres = require('postgres');
+const { ensureAtivoColumn } = require('../lib/colaboradores');
 
 const colaboradoresData = [
   {"codigo": "689", "nome": "João Fonseca", "loja": "PAREDES SM", "funcao": "Técnico", "empresa": "Expressglass SA"},
@@ -33,7 +34,8 @@ exports.handler = async (event, context) => {
     // Se tiver DATABASE_URL, buscar da base de dados
     if (process.env.DATABASE_URL) {
       const sql = postgres(process.env.DATABASE_URL, { ssl: 'prefer' });
-      const colaboradores = await sql`SELECT * FROM colaboradores ORDER BY nome`;
+      await ensureAtivoColumn(sql);
+      const colaboradores = await sql`SELECT * FROM colaboradores WHERE ativo ORDER BY nome`;
       await sql.end();
       
       return {

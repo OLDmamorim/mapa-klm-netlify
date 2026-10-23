@@ -1,4 +1,5 @@
 const postgres = require('postgres');
+const { ensureAtivoColumn } = require('../lib/colaboradores');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -24,12 +25,29 @@ exports.handler = async (event, context) => {
     }
     
     const sql = postgres(process.env.DATABASE_URL, { ssl: 'prefer' });
-    
+    await ensureAtivoColumn(sql);
+
     // Verificar se o código já existe
     const existing = await sql`
-      SELECT codigo FROM colaboradores WHERE codigo = ${data.codigo}
+      SELECT codigo, ativo FROM colaboradores WHERE codigo = ${data.codigo}
     `;
-    
+
+    // Código de um colaborador desativado: reativar com os dados novos
+    if (existing.length > 0 && !existing[0].ativo) {
+      await sql`
+        UPDATE colaboradores
+        SET nome = ${data.nome}, loja = ${data.loja}, funcao = ${data.funcao},
+            empresa = ${data.empresa}, ativo = TRUE
+        WHERE codigo = ${data.codigo}
+      `;
+      await sql.end();
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: true, message: 'Colaborador reativado com sucesso' })
+      };
+    }
+
     if (existing.length > 0) {
       await sql.end();
       return {
